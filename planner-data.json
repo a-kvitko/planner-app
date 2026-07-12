@@ -1,0 +1,222 @@
+{
+  "tasks": [
+    {
+      "id": "mnjf55br4dpb",
+      "text": "P3. Orlova. 25.03.26 [TDWEB-16557] Nickname Display in Web UI",
+      "cat": "work",
+      "done": false,
+      "ts": 1775251895607,
+      "milestones": [
+        {
+          "id": "mnrza02d1zkm",
+          "text": "discuss the new idea with Orlova about the mini chart animation",
+          "description": "",
+          "priority": "p3",
+          "cat": "work",
+          "done": false,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnob97zlqx66",
+          "text": "check the schemes in miro",
+          "description": "https://miro.com/app/board/uXjVGvxKTSo=/?userEmail=akvitko@devexperts.com&track=true&utm_source=notification&utm_medium=email&utm_campaign=add-to-team-and-board&utm_content=go-to-board&share_link_id=867036236457&lid=4oe19kzdo5cf",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnob9oz5d28x",
+          "text": "add missed cases",
+          "description": "",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnoba0pasitf",
+          "text": "confirm with Jane",
+          "description": "",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        }
+      ],
+      "comments": [],
+      "links": [],
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-16557\n\n03.04.26 — Отоправил Жене наброски вариантов https://www.figma.com/design/jcjTTxpjOyTohYM90UAsgX/TD-AT-%F0%9F%8C%90-New-Features?node-id=21232-36966&t=3JsPdjeNufhk5vxK-4",
+      "priority": "p3",
+      "progress": 75
+    },
+    {
+      "id": "mnjf506pn1bo",
+      "text": "Check Maria’s tickets and tracking. Find out why so much time was tracked",
+      "cat": "work",
+      "done": false,
+      "ts": 1775251888945,
+      "milestones": [
+        {
+          "id": "mnno1tlpkh5a",
+          "text": "werwerwe wer wer wer wer",
+          "description": "",
+          "priority": "p3",
+          "cat": "personal",
+          "done": false,
+          "comments": [],
+          "links": []
+        }
+      ],
+      "comments": [],
+      "links": [],
+      "description": "Нужно переодически проверь сколько времени Мими трекает на задачи",
+      "priority": "p4",
+      "progress": 0
+    },
+    {
+      "id": "mnn9bkj47isa",
+      "text": "Upload Olga's and Dima's  PPR sheets to WD",
+      "description": "Ask Elena Ukhanove to do that",
+      "cat": "work",
+      "priority": "p4",
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1775483982256
+    },
+    {
+      "id": "mnn9lpvu54q6",
+      "text": "P3. 12.03.26 👀 Orlova [TDWEB-16497] Fractional share - UX flows for Close Position",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-16497\n08.04.26 — add the chart case — https://www.figma.com/design/BwFWHpyZnIQQxFtDqP0GTU/TD-AT-%F0%9F%8C%90-Design-Enhancements?node-id=259-1435&t=eYLHxnd4VSHLgdGU-11\n\n12.03.26 — Not read, not started yet",
+      "cat": "work",
+      "priority": "p3",
+      "done": false,
+      "milestones": [
+        {
+          "id": "mnrzlvhuh3ii",
+          "text": "add a case with Chart",
+          "description": "https://www.figma.com/design/BwFWHpyZnIQQxFtDqP0GTU/TD-AT-%F0%9F%8C%90-Design-Enhancements?node-id=259-1435&t=eYLHxnd4VSHLgdGU-11",
+          "priority": "p2",
+          "cat": "work",
+          "done": false,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnrznj7w0ock",
+          "text": "цвет для дробного значения. Жду ответа от Жени",
+          "description": "https://www.figma.com/design/BwFWHpyZnIQQxFtDqP0GTU?node-id=268-2713#1690330727",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnrzo3i8vic5",
+          "text": "03.04.26 — добавить коммент с объяснением почему я выбрал голубой цвет для иконки и приглушенный",
+          "description": "",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mnrzmuh5jjez",
+          "text": "25.03.26 — made first drafts",
+          "description": "https://www.figma.com/design/BwFWHpyZnIQQxFtDqP0GTU/TD-AT-%F0%9F%8C%90-Design-Enhancements?node-id=259-1431",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": []
+        }
+      ],
+      "comments": [],
+      "links": [],
+      "progress": 75,
+      "ts": 1775484455754
+    },
+    {
+      "id": "mnoaoj3v4lxt",
+      "text": "[TDWEB-16653] [a11y][Order Entry] - Zoom issue for errored fields",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-16653",
+      "cat": "work",
+      "priority": "p3",
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1775546732731
+    },
+    {
+      "id": "mnolrebfc43j",
+      "text": "test task",
+      "description": "",
+      "cat": "work",
+      "priority": "p3",
+      "done": true,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1775565342267
+    },
+    {
+      "id": "mnqiichpua8w",
+      "text": "P3 Lopes/Dzhelebov [TDWADMIN-7291] [TDBL-3730] [CAD] AdminUI - Inter-listed securities must be combined and displayed in the currency of the account",
+      "description": "https://jira.in.devexperts.com/browse/TDWADMIN-7291\ndesign spec — https://www.figma.com/design/ftyPdbO8eJyKJz2vGKXJ8F/TDBL-3730%C2%B7%E2%80%89CAD%C2%B7%E2%80%89Admin---Inter-listed-securities-in-the-account-currency?node-id=6-246\n\n08.03.2026 — started",
+      "cat": "work",
+      "priority": "p2",
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1775680813501
+    }
+  ],
+  "notes": [],
+  "goals": [
+    {
+      "comments": [],
+      "links": [],
+      "id": "mnkrozhl6t2x",
+      "title": "goal 1",
+      "cat": "career",
+      "milestones": [
+        {
+          "id": "mnnq6hf7vl4a",
+          "text": "as asd asd",
+          "description": "",
+          "priority": "p2",
+          "cat": "health",
+          "done": false,
+          "comments": [],
+          "links": []
+        }
+      ],
+      "progress": 0,
+      "ts": 1775333442729,
+      "done": false,
+      "description": "",
+      "priority": "p3"
+    }
+  ],
+  "journal": [
+    {
+      "id": "mnopou96d9px",
+      "text": "kjah skajdh aksjd ad",
+      "ts": 1775572476741
+    }
+  ]
+}

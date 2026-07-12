@@ -1,0 +1,11 @@
+{
+  "name": "planner-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "dexie": "^4.0.10"
+  }
+}
