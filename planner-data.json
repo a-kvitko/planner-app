@@ -8,11 +8,12 @@
       "ts": 1775251895607,
       "milestones": [
         {
-          "id": "mnrza02d1zkm",
-          "text": "discuss the new idea with Orlova about the mini chart animation",
+          "id": "mo6z0wapr8il",
+          "text": "check the status. and what about the new solution I suggested with the side-button",
           "description": "",
           "priority": "p3",
           "cat": "work",
+          "tagIds": [],
           "done": false,
           "comments": [],
           "links": []
@@ -25,7 +26,8 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         },
         {
           "id": "mnob9oz5d28x",
@@ -35,7 +37,8 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         },
         {
           "id": "mnoba0pasitf",
@@ -45,14 +48,41 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
+        },
+        {
+          "id": "mnrza02d1zkm",
+          "text": "discuss the new idea with Orlova about the mini chart animation",
+          "description": "",
+          "priority": "p3",
+          "cat": "work",
+          "done": true,
+          "comments": [],
+          "links": [],
+          "tagIds": []
         }
       ],
       "comments": [],
       "links": [],
-      "description": "https://jira.in.devexperts.com/browse/TDWEB-16557\n\n03.04.26 — Отоправил Жене наброски вариантов https://www.figma.com/design/jcjTTxpjOyTohYM90UAsgX/TD-AT-%F0%9F%8C%90-New-Features?node-id=21232-36966&t=3JsPdjeNufhk5vxK-4",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-16557\n\n03.04.26 — Отправил Жене наброски вариантов https://www.figma.com/design/jcjTTxpjOyTohYM90UAsgX/TD-AT-%F0%9F%8C%90-New-Features?node-id=21232-36966&t=3JsPdjeNufhk5vxK-4",
       "priority": "p3",
-      "progress": 75
+      "progress": 80,
+      "tagIds": [
+        "mnrzzd57bino",
+        "mnyawsv6pszp"
+      ],
+      "kind": "do",
+      "scheduledOn": "2026-09-14",
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWEB-16557"
     },
     {
       "id": "mnjf506pn1bo",
@@ -69,14 +99,32 @@
           "cat": "personal",
           "done": false,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         }
       ],
       "comments": [],
       "links": [],
       "description": "Нужно переодически проверь сколько времени Мими трекает на задачи",
       "priority": "p4",
-      "progress": 0
+      "progress": 0,
+      "tagIds": [
+        "mns00416do3r",
+        "mnyawv54zt29",
+        "mns006zuavff",
+        "mnyaxsgr89pj"
+      ],
+      "kind": "do",
+      "scheduledOn": "2026-09-14",
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
     },
     {
       "id": "mnn9bkj47isa",
@@ -84,12 +132,24 @@
       "description": "Ask Elena Ukhanove to do that",
       "cat": "work",
       "priority": "p4",
-      "done": false,
+      "done": true,
       "milestones": [],
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1775483982256
+      "ts": 1775483982256,
+      "tagIds": [],
+      "kind": "do",
+      "scheduledOn": null,
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": "2026-04-06T13:59:42.256Z",
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
     },
     {
       "id": "mnn9lpvu54q6",
@@ -107,7 +167,8 @@
           "cat": "work",
           "done": false,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         },
         {
           "id": "mnrznj7w0ock",
@@ -117,7 +178,8 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         },
         {
           "id": "mnrzo3i8vic5",
@@ -127,7 +189,8 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         },
         {
           "id": "mnrzmuh5jjez",
@@ -137,13 +200,30 @@
           "cat": "work",
           "done": true,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         }
       ],
       "comments": [],
       "links": [],
       "progress": 75,
-      "ts": 1775484455754
+      "ts": 1775484455754,
+      "tagIds": [
+        "mns00416do3r",
+        "mns00c9obyi3",
+        "mns00n4rgrjt"
+      ],
+      "kind": "wait",
+      "scheduledOn": "2026-09-14",
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWEB-16497"
     },
     {
       "id": "mnoaoj3v4lxt",
@@ -156,7 +236,22 @@
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1775546732731
+      "ts": 1775546732731,
+      "tagIds": [
+        "mnyawsv6pszp",
+        "mnrzzd57bino"
+      ],
+      "kind": "do",
+      "scheduledOn": "2026-09-14",
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWEB-16653"
     },
     {
       "id": "mnolrebfc43j",
@@ -169,7 +264,19 @@
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1775565342267
+      "ts": 1775565342267,
+      "tagIds": [],
+      "kind": "do",
+      "scheduledOn": null,
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": "2026-04-07T12:35:42.267Z",
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
     },
     {
       "id": "mnqiichpua8w",
@@ -182,7 +289,97 @@
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1775680813501
+      "ts": 1775680813501,
+      "tagIds": [
+        "mnyawq89hy4y",
+        "mnrzzz5deeaw"
+      ],
+      "kind": "do",
+      "scheduledOn": null,
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWADMIN-7291"
+    },
+    {
+      "id": "mu0bck46xd24",
+      "text": "P2 Wait — Things import sample [TDWEB-99999] Check with Orlova",
+      "description": "x",
+      "cat": "work",
+      "priority": "p2",
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "tagIds": [],
+      "ts": 1789334141910,
+      "kind": "wait",
+      "scheduledOn": "2026-09-15",
+      "deadline": null,
+      "project": "TDW Backlog",
+      "jiraKey": "TDWEB-99999",
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "progress": 0
+    },
+    {
+      "id": "mu0bck464a4p",
+      "text": "Promise sample to Justin",
+      "description": "Send draft",
+      "cat": "work",
+      "priority": "p1",
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "tagIds": [],
+      "ts": 1789334141910,
+      "kind": "promise",
+      "scheduledOn": "2026-09-16",
+      "deadline": "2026-09-16",
+      "project": null,
+      "jiraKey": null,
+      "waitingOn": null,
+      "promisedTo": "Justin",
+      "nextCheckAt": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "progress": 0
+    },
+    {
+      "id": "mu0wyjv1k73x",
+      "text": "Promise Dimitar",
+      "description": "",
+      "cat": "work",
+      "priority": "p1",
+      "tagIds": [],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1789370439949,
+      "kind": "promise",
+      "scheduledOn": "2026-09-14",
+      "waitingOn": null,
+      "promisedTo": "DImitar",
+      "nextCheckAt": null,
+      "deadline": "2026-09-14",
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
     }
   ],
   "notes": [],
@@ -202,21 +399,117 @@
           "cat": "health",
           "done": false,
           "comments": [],
-          "links": []
+          "links": [],
+          "tagIds": []
         }
       ],
       "progress": 0,
       "ts": 1775333442729,
       "done": false,
       "description": "",
-      "priority": "p3"
+      "priority": "p3",
+      "tagIds": []
     }
   ],
   "journal": [
     {
+      "id": "mo8d03asf1fi",
+      "text": "TDW design sync\n\nMimi\n- [TDW-1571] [CAD] Mobile UI - Unified account switching functionality across widgets\nhttps://jira.in.devexperts.com/browse/TDW-1571\n\nVitya\n- \n\nMe\n- [TDWEB-14105] [a11y][Feedback][Order Confirmation pop-up] - Text overlap and not aligned properly\nhttps://jira.in.devexperts.com/browse/TDWEB-14105",
+      "ts": 1776759954868,
+      "tagIds": [
+        "mnyaxsgr89pj"
+      ]
+    },
+    {
       "id": "mnopou96d9px",
       "text": "kjah skajdh aksjd ad",
-      "ts": 1775572476741
+      "ts": 1775572476741,
+      "tagIds": []
     }
-  ]
+  ],
+  "tags": [
+    {
+      "id": "mnrzzd57bino",
+      "name": "tdw-web",
+      "order": 0
+    },
+    {
+      "id": "mnrzzz5deeaw",
+      "name": "tdw-admin",
+      "order": 1
+    },
+    {
+      "id": "mns00416do3r",
+      "name": "tdw-mobile",
+      "order": 2
+    },
+    {
+      "id": "mns006zuavff",
+      "name": "waiting",
+      "order": 3
+    },
+    {
+      "id": "mns00c9obyi3",
+      "name": "clarify",
+      "order": 4
+    },
+    {
+      "id": "mns00fjf6vcu",
+      "name": "watch",
+      "order": 5
+    },
+    {
+      "id": "mns00jqz9s73",
+      "name": "plugin",
+      "order": 6
+    },
+    {
+      "id": "mns00n4rgrjt",
+      "name": "defect-report",
+      "order": 7
+    },
+    {
+      "id": "mnyawmpwt18t",
+      "name": "P1",
+      "order": 8
+    },
+    {
+      "id": "mnyawq89hy4y",
+      "name": "P2",
+      "order": 9
+    },
+    {
+      "id": "mnyawsv6pszp",
+      "name": "P3",
+      "order": 10
+    },
+    {
+      "id": "mnyawv54zt29",
+      "name": "P4",
+      "order": 11
+    },
+    {
+      "id": "mnyaxsgr89pj",
+      "name": "management",
+      "order": 12
+    }
+  ],
+  "settings": {
+    "workDayMinutes": 480,
+    "commsBlockMinutes": 90,
+    "workDayStart": "10:00",
+    "maxDoItems": 5,
+    "maxWaitChecks": 5,
+    "lunchMinutes": 30,
+    "defaultEstimateMin": 45,
+    "noWeekends": true,
+    "weekTemplate": [],
+    "wedOneOnOneRotation": {
+      "anchorYmd": "2026-01-07",
+      "first": "Dima"
+    },
+    "dayOverrides": {}
+  },
+  "schemaVersion": 2,
+  "updatedAt": "2026-09-14T07:21:25.662Z"
 }

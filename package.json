@@ -3,7 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "check:phase0": "node scripts/phase0-check.mjs",
+    "check:phase-a": "node scripts/phase-a-check.mjs",
+    "check:capacity": "node --input-type=module -e \"import('./js/capacity.js').then(m=>m._selfCheck())\"",
+    "check:api-ops": "node --input-type=module -e \"import('./js/api-ops.js').then(m=>m._selfCheck())\""
   },
   "dependencies": {
     "dexie": "^4.0.10"

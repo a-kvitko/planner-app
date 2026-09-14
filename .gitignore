@@ -4,5 +4,8 @@ node_modules/
 .env
 .env.*
 
+# Local data backups (may contain personal work notes)
+backups/
+
 # Local MCP config may contain API keys
 .cursor/mcp.json

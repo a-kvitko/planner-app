@@ -443,7 +443,62 @@
   }
   .task-section-head.task-section-complete { margin-top: 24px; }
   .task-list-empty-hint { font-size: 13px; color: var(--text3); padding: 8px 0 4px; }
+  .today-cap-stub {
+    font-size: 13px; color: var(--text2); margin: 0 0 12px; padding: 10px 12px;
+    background: var(--surface2, var(--bg2, transparent)); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .today-cap-stub strong { color: var(--text); font-weight: 600; }
+  .today-cap-stub.is-overload {
+    border-color: color-mix(in srgb, #c44 55%, var(--border));
+    background: color-mix(in srgb, #c44 8%, transparent);
+  }
+  .today-cap-meter {
+    height: 6px; border-radius: 999px; background: var(--border); margin: 8px 0 6px; overflow: hidden;
+  }
+  .today-cap-meter > span {
+    display: block; height: 100%; border-radius: inherit; background: var(--accent, #3b82f6);
+    max-width: 100%;
+  }
+  .today-cap-meter.is-over > span { background: #c44; }
+  .today-cap-blocks { font-size: 12px; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+  .capacity-settings-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px 12px;
+  }
+  .capacity-settings-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text3); }
+  .today-triage-row {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .today-triage-row .triage-title { flex: 1; min-width: 160px; font-size: 14px; }
+  .today-triage-row.is-zombie .triage-title::after {
+    content: ' zombie'; font-size: 11px; color: #c44; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .today-triage-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .today-triage-actions input[type="date"] {
+    font: inherit; font-size: 12px; padding: 4px 6px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text);
+  }
+  .today-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; align-items: center; }
+  .today-filters input, .today-filters select {
+    font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text);
+  }
+  .today-filters input { min-width: 120px; }
+  .today-composer-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .today-section-wait .task-section-head { opacity: 0.85; }
+  .today-section-wait .task-item-figma { opacity: 0.88; }
+  .kind-pill { text-transform: capitalize; }
+  .kind-pill-wait { opacity: 0.75; }
+  .today-meta-line { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .task-day-toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+  .task-day-toolbar input[type="date"],
+  .task-day-toolbar input[type="text"],
+  .task-day-toolbar select {
+    font: inherit; font-size: 12px; padding: 4px 6px; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--bg); color: var(--text);
+  }
   #task-list,
+  #today-list,
   #goal-list,
   #journal-list {
     min-width: 0;
@@ -1107,7 +1162,11 @@
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4"/><path d="M10 10l3 3"/></svg>
       Search
     </button>
-    <button type="button" class="nav-btn active" data-tab="tasks" onclick="switchTab('tasks', this)">
+    <button type="button" class="nav-btn active" data-tab="today" onclick="switchTab('today', this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5 1.5v3M11 1.5v3"/></svg>
+      Today
+    </button>
+    <button type="button" class="nav-btn" data-tab="tasks" onclick="switchTab('tasks', this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
       Tasks
     </button>
@@ -1145,8 +1204,33 @@
   </nav>
 
   <main class="main">
-    <!-- TASKS -->
-    <div id="panel-tasks" class="panel tasks-panel-figma active">
+    <!-- TODAY -->
+    <div id="panel-today" class="panel tasks-panel-figma active">
+      <div class="tasks-page-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <h1 class="tasks-page-title" style="margin:0">Today</h1>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="btn btn--outline btn--dense" id="btn-morning-mode" onclick="setTodayMode('morning')">Morning</button>
+          <button type="button" class="btn btn--outline btn--dense" id="btn-evening-mode" onclick="setTodayMode('evening')">Evening clear</button>
+          <button type="button" class="btn btn--outline btn--dense" id="btn-day-mode" onclick="setTodayMode('day')" style="display:none">Back to Today</button>
+        </div>
+      </div>
+      <div id="today-cap" class="today-cap-stub"></div>
+      <div class="today-filters" id="today-filters">
+        <select id="today-filter-p" aria-label="Priority filter" onchange="onTodayFilterChange()">
+          <option value="">All P</option>
+          <option value="p1">P1</option>
+          <option value="p2">P2</option>
+          <option value="p3">P3</option>
+          <option value="p4">P4</option>
+        </select>
+        <input type="text" id="today-filter-person" placeholder="Person…" aria-label="Person filter" oninput="onTodayFilterChange()">
+        <input type="text" id="today-filter-jira" placeholder="Jira key…" aria-label="Jira filter" oninput="onTodayFilterChange()">
+      </div>
+      <div id="today-list"></div>
+    </div>
+
+    <!-- TASKS (backlog) -->
+    <div id="panel-tasks" class="panel tasks-panel-figma">
       <div class="tasks-page-head">
         <h1 class="tasks-page-title">Tasks</h1>
       </div>
@@ -1273,6 +1357,69 @@
           </label>
         </div>
       </div>
+      <div class="section-label" style="margin-top:24px">Capacity</div>
+      <div class="card" id="capacity-settings-card">
+        <div style="font-size:14px;font-weight:500;margin-bottom:10px">Workday budget</div>
+        <div class="capacity-settings-grid">
+          <label>Work day (min)
+            <input type="number" id="set-work-day-min" min="60" max="720" step="15" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Comms block (min)
+            <input type="number" id="set-comms-min" min="0" max="240" step="15" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Lunch (min)
+            <input type="number" id="set-lunch-min" min="0" max="120" step="5" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Start
+            <select id="set-work-start" onchange="saveCapacitySettingsFromForm()">
+              <option value="10:00">10:00</option>
+              <option value="11:00">11:00</option>
+            </select>
+          </label>
+          <label>Max Do items
+            <input type="number" id="set-max-do" min="1" max="12" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Max Wait checks
+            <input type="number" id="set-max-wait" min="1" max="12" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Default estimate (min)
+            <input type="number" id="set-default-est" min="5" max="240" step="5" onchange="saveCapacitySettingsFromForm()">
+          </label>
+          <label>Wed 1:1 first
+            <select id="set-wed-first" onchange="saveCapacitySettingsFromForm()">
+              <option value="Dima">Dima</option>
+              <option value="Mimi">Mimi</option>
+            </select>
+          </label>
+        </div>
+        <div style="font-size:14px;font-weight:500;margin:16px 0 8px">Extra meetings today</div>
+        <div class="capacity-settings-grid">
+          <label>Date
+            <input type="date" id="set-override-date" onchange="loadDayOverrideForm()">
+          </label>
+          <label>Extra meeting (min)
+            <input type="number" id="set-override-min" min="0" max="480" step="15" onchange="saveDayOverrideFromForm()">
+          </label>
+          <label>Note
+            <input type="text" id="set-override-note" placeholder="Workshop…" onchange="saveDayOverrideFromForm()">
+          </label>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-top:10px">Week template is built-in (standup, BA, design sync, Wed mobile, Fri 1:1s). Live calendar import is later.</div>
+      </div>
+      <div class="section-label" style="margin-top:24px">Import</div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:500">Things dump (JSON)</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;margin-bottom:10px">
+          Expects an array of items (or <code>{ "items": [...] }</code>) with
+          <code>title</code>, <code>notes</code>, <code>tags</code>, <code>when</code>/<code>scheduledOn</code>, <code>deadline</code>, <code>project</code>.
+          Tags Do/Wait/Promise/Park → kind; P1–P4 → priority.
+        </div>
+        <label class="btn btn--outline btn--dense" style="cursor:pointer;display:inline-flex">
+          Import Things JSON
+          <input type="file" accept=".json,application/json" onchange="importThingsDump(event)" style="display:none">
+        </label>
+        <div id="things-import-status" style="font-size:12px;color:var(--text3);margin-top:8px"></div>
+      </div>
       <div class="section-label" style="margin-top:24px">Tags</div>
       <div class="card">
         <div style="font-size:14px;font-weight:500">Custom tags</div>
@@ -1341,7 +1488,47 @@ function applyJournalDashboardVisibility() {
   if (wrap) wrap.classList.toggle('is-collapsed', !show);
   if (input) input.checked = show;
 }
-let data = { tasks:[], notes:[], goals:[], journal:[], tags:[] };
+const SCHEMA_VERSION = 2;
+const TASK_KINDS = ['do', 'wait', 'promise', 'park'];
+
+function defaultSettings() {
+  return {
+    workDayMinutes: 480,
+    commsBlockMinutes: 90,
+    workDayStart: '10:00',
+    maxDoItems: 5,
+    maxWaitChecks: 5,
+    lunchMinutes: 30,
+    defaultEstimateMin: 45,
+    noWeekends: true,
+    weekTemplate: [],
+    wedOneOnOneRotation: { anchorYmd: '2026-01-07', first: 'Dima' },
+    dayOverrides: {}
+  };
+}
+
+function normalizeSettings(s) {
+  const d = defaultSettings();
+  if (!s || typeof s !== 'object' || Array.isArray(s)) return { ...d };
+  const rotIn = s.wedOneOnOneRotation && typeof s.wedOneOnOneRotation === 'object' ? s.wedOneOnOneRotation : {};
+  const overrides = s.dayOverrides && typeof s.dayOverrides === 'object' && !Array.isArray(s.dayOverrides)
+    ? s.dayOverrides
+    : {};
+  return {
+    ...d,
+    ...s,
+    weekTemplate: Array.isArray(s.weekTemplate) ? s.weekTemplate : d.weekTemplate,
+    noWeekends: s.noWeekends !== false,
+    defaultEstimateMin: Number.isFinite(Number(s.defaultEstimateMin)) ? Number(s.defaultEstimateMin) : d.defaultEstimateMin,
+    wedOneOnOneRotation: {
+      anchorYmd: rotIn.anchorYmd || d.wedOneOnOneRotation.anchorYmd,
+      first: rotIn.first === 'Mimi' ? 'Mimi' : 'Dima'
+    },
+    dayOverrides: overrides
+  };
+}
+
+let data = { tasks:[], notes:[], goals:[], journal:[], tags:[], settings: defaultSettings(), schemaVersion: SCHEMA_VERSION, updatedAt: null };
 /** Ephemeral UI: filter by tag id (OR — show items that have any selected tag). */
 let taskTagFilterIds = [];
 let goalTagFilterIds = [];
@@ -1350,7 +1537,6 @@ let journalTagFilterIds = [];
 let openTaskTabs = {};
 let taskEditSnapshots = {};
 let taskSubtaskComposerFor = null;
-let composerDraftPriority = 'p3';
 let nestedDraftCat = 'work';
 let nestedDraftPriority = 'p3';
 let nestedStDraftTitle = '';
@@ -1385,8 +1571,21 @@ let nestedGoalStDraftDesc = '';
 let goalEditSnapshots = {};
 let taskComposerOpen = false;
 let composerDraftCat = 'work';
+let composerDraftPriority = 'p3';
 let composerDraftTitle = '';
 let composerDraftDesc = '';
+/** @type {'do'|'promise'|'wait'} */
+let composerDraftKind = 'do';
+let composerDraftPerson = '';
+let composerDraftWhen = '';
+let todayFilterPriority = '';
+let todayFilterPerson = '';
+let todayFilterJira = '';
+/** @type {'day'|'evening'|'morning'} */
+let todayMode = 'day';
+let morningPickIds = {};
+let scheduleMod = null;
+let capacityMod = null;
 let journalComposerOpen = false;
 let composerJournalDraft = '';
 const expandedJournal = {};
@@ -1483,7 +1682,7 @@ function onTaskRowClick(id, e) {
         pendingFocusTaskTitleId = id;
       }
       save();
-      renderTasks();
+      refreshTaskLists();
     });
     return;
   }
@@ -1496,7 +1695,7 @@ function onTaskRowClick(id, e) {
     pendingFocusTaskTitleId = id;
   }
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function onTaskTitleDblClick(id, e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -1507,7 +1706,7 @@ function onTaskTitleDblClick(id, e) {
     captureTaskEditSnapshot(id);
     pendingFocusTaskTitleId = id;
     save();
-    renderTasks();
+    refreshTaskLists();
   }
 }
 function onGoalRowClick(id, e) {
@@ -1576,8 +1775,97 @@ async function getPersistModule() {
   }
 }
 
-/** Persist to IndexedDB when available, otherwise localStorage. */
+async function getScheduleModule() {
+  if (scheduleMod) return scheduleMod;
+  try {
+    scheduleMod = await import('./js/schedule.js');
+    return scheduleMod;
+  } catch (e) {
+    console.warn('Planner: schedule module not available', e);
+    scheduleMod = null;
+    return null;
+  }
+}
+
+async function getCapacityModule() {
+  if (capacityMod) return capacityMod;
+  try {
+    capacityMod = await import('./js/capacity.js');
+    return capacityMod;
+  } catch (e) {
+    console.warn('Planner: capacity module not available', e);
+    capacityMod = null;
+    return null;
+  }
+}
+
+function computeCapacityFor(ymd) {
+  if (capacityMod && capacityMod.computeDayCapacity) {
+    return capacityMod.computeDayCapacity(ymd, data.settings || {}, data.tasks || []);
+  }
+  return null;
+}
+
+function confirmCapacityOverload(cap, nextDoCount, nextPlannedMin) {
+  if (!cap) return true;
+  const overCount = nextDoCount > cap.maxDoItems;
+  const overMin = nextPlannedMin > cap.availableDoMinutes;
+  if (!overCount && !overMin) return true;
+  const bits = [];
+  if (overCount) bits.push(`Do/Promise ${nextDoCount}/${cap.maxDoItems}`);
+  if (overMin) bits.push(`${nextPlannedMin}m planned > ${cap.availableDoMinutes}m available`);
+  return window.confirm('Today looks overloaded (' + bits.join('; ') + '). Add anyway?');
+}
+
+function todayYmdLocal(d = new Date()) {
+  if (scheduleMod && scheduleMod.todayYmd) return scheduleMod.todayYmd(d);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+}
+
+function snapWorkday(ymd) {
+  const noWeekends = !(data && data.settings && data.settings.noWeekends === false);
+  if (scheduleMod && scheduleMod.snapToWorkday) return scheduleMod.snapToWorkday(ymd, noWeekends);
+  return ymd || null;
+}
+
+function isPanelActive(tab) {
+  const p = document.getElementById('panel-' + tab);
+  return !!(p && p.classList.contains('active'));
+}
+
+function refreshTaskLists() {
+  renderToday();
+  renderTasks();
+}
+
+function updatedAtMs(obj) {
+  if (!obj || typeof obj.updatedAt !== 'string') return 0;
+  const t = Date.parse(obj.updatedAt);
+  return Number.isFinite(t) ? t : 0;
+}
+
+async function persistDataToServer() {
+  try {
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) console.warn('Planner: /api/save failed', res.status);
+  } catch (e) {
+    console.warn('Planner: /api/save error', e);
+  }
+}
+
+/** Persist to IndexedDB when available, otherwise localStorage; then mirror to disk via /api/save. */
 async function persistData() {
+  data.schemaVersion = SCHEMA_VERSION;
+  data.settings = normalizeSettings(data.settings);
+  data.tasks = (data.tasks || []).map(normalizeTask);
+  data.updatedAt = new Date().toISOString();
   if (persistModuleCache) {
     await persistModuleCache.saveState(data);
     if (tabSyncNotify) tabSyncNotify.notifySaved();
@@ -1588,15 +1876,59 @@ async function persistData() {
       console.warn('Planner: localStorage save failed', e);
     }
   }
+  await persistDataToServer();
+}
+
+async function fetchServerState() {
+  try {
+    const res = await fetch('/planner-data.json', { cache: 'no-store' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+async function pullServerStateIfNewer() {
+  if (!persistenceReady) return;
+  const file = await fetchServerState();
+  if (!file) return;
+  if (updatedAtMs(file) <= updatedAtMs(data)) return;
+  data = normalizePlannerImport(file);
+  ensureDataShape();
+  if (persistModuleCache) {
+    try {
+      await persistModuleCache.saveState(data);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+  renderAll();
+  const gs = document.getElementById('global-search-input');
+  if (gs && gs.value.trim()) runGlobalSearch(gs.value);
 }
 
 function ensureDataShape() {
-  if (!data) data = { tasks: [], notes: [], goals: [], journal: [], tags: [] };
+  if (!data) {
+    data = {
+      tasks: [],
+      notes: [],
+      goals: [],
+      journal: [],
+      tags: [],
+      settings: defaultSettings(),
+      schemaVersion: SCHEMA_VERSION,
+      updatedAt: null
+    };
+  }
   if (!Array.isArray(data.tasks)) data.tasks = [];
   if (!Array.isArray(data.notes)) data.notes = [];
   if (!Array.isArray(data.goals)) data.goals = [];
   if (!Array.isArray(data.journal)) data.journal = [];
   if (!Array.isArray(data.tags)) data.tags = [];
+  data.schemaVersion = typeof data.schemaVersion === 'number' ? Math.max(data.schemaVersion, SCHEMA_VERSION) : SCHEMA_VERSION;
+  data.settings = normalizeSettings(data.settings);
+  if (data.updatedAt != null && typeof data.updatedAt !== 'string') data.updatedAt = null;
   reconcileTagsWithUsage();
 }
 
@@ -1631,6 +1963,8 @@ async function load() {
   try {
     ensureDataShape();
     await getPersistModule();
+    await getScheduleModule();
+    await getCapacityModule();
     let loaded = false;
 
     if (persistModuleCache) {
@@ -1666,12 +2000,27 @@ async function load() {
 
     if (!loaded) {
       try {
-        const res = await fetch('planner-data.json', { cache: 'no-store' });
-        if (res.ok) {
-          const imported = await res.json();
-          if (imported.tasks || imported.notes || imported.goals || imported.journal) {
-            data = normalizePlannerImport(imported);
-            await persistData();
+        const imported = await fetchServerState();
+        if (imported && (imported.tasks || imported.notes || imported.goals || imported.journal)) {
+          data = normalizePlannerImport(imported);
+          await persistData();
+          loaded = true;
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    } else {
+      // Prefer disk when file updatedAt is newer (agent / other client wrote file).
+      try {
+        const file = await fetchServerState();
+        if (file && updatedAtMs(file) > updatedAtMs(data)) {
+          data = normalizePlannerImport(file);
+          if (persistModuleCache) {
+            try {
+              await persistModuleCache.saveState(data);
+            } catch (e) {
+              /* ignore */
+            }
           }
         }
       } catch (e) {
@@ -1680,6 +2029,10 @@ async function load() {
     }
 
     ensureDataShape();
+    // First boot after schema upgrade: stamp + mirror to disk so agents see live state.
+    if (!data.updatedAt) {
+      await persistData();
+    }
     renderAll();
     initGlobalSearch();
   } catch (err) {
@@ -1723,10 +2076,16 @@ async function flushPersistNow() {
 window.addEventListener('pagehide', () => { void flushPersistNow(); });
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'hidden' || !persistTimer) return;
-  clearTimeout(persistTimer);
-  persistTimer = null;
-  void flushPersist();
+  if (document.visibilityState === 'hidden') {
+    if (!persistTimer) return;
+    clearTimeout(persistTimer);
+    persistTimer = null;
+    void flushPersist();
+    return;
+  }
+  if (document.visibilityState === 'visible') {
+    void pullServerStateIfNewer();
+  }
 });
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -1790,7 +2149,48 @@ function reconcileTagsWithUsage() {
   sortTagsInPlace();
 }
 
+function normalizeKind(k) {
+  const s = String(k || '').toLowerCase();
+  return TASK_KINDS.includes(s) ? s : 'do';
+}
+
+function normalizeOptionalString(v) {
+  if (v == null) return null;
+  const s = String(v).trim();
+  return s ? s : null;
+}
+
+function normalizeOptionalYmd(v) {
+  const s = normalizeOptionalString(v);
+  if (!s) return null;
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
+}
+
+function normalizeOptionalMin(v) {
+  if (v == null || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+/** Things-like title hints. Does not change title text. Field priority wins when already set. */
+function parseTaskTitleHints(text) {
+  const raw = String(text || '');
+  const out = {};
+  const jira = raw.match(/\[([A-Z][A-Z0-9]+-\d+)\]/);
+  if (jira) out.jiraKey = jira[1];
+  const p = raw.match(/\bP([1-4])(?:\.\d+)?\b/i);
+  if (p) out.priorityFromTitle = 'p' + p[1];
+  const kindM =
+    raw.match(/\bP[1-4](?:\.\d+)?\s+(Do|Wait|Promise|Park)\b/i) ||
+    raw.match(/^(Do|Wait|Promise|Park)\s*[—\-:–]\s*/i);
+  if (kindM) out.kindFromTitle = kindM[1].toLowerCase();
+  return out;
+}
+
 function normalizeTask(t) {
+  const hadPriority = t.priority != null && String(t.priority).trim() !== '';
+  const hadKind = t.kind != null && String(t.kind).trim() !== '';
+  const hints = parseTaskTitleHints(t.text);
   const milestones = (t.milestones || []).map(m => ({
     ...m,
     description: m.description != null ? String(m.description) : '',
@@ -1801,6 +2201,21 @@ function normalizeTask(t) {
     tagIds: normalizeTagIds(m.tagIds)
   }));
   normalizeMilestoneOrderInPlace(milestones);
+  let priority = normalizeTaskPriority(t.priority);
+  if (!hadPriority && hints.priorityFromTitle) priority = hints.priorityFromTitle;
+  const kind = hadKind
+    ? normalizeKind(t.kind)
+    : hints.kindFromTitle
+      ? normalizeKind(hints.kindFromTitle)
+      : 'do';
+  const done = !!t.done;
+  let completedAt = null;
+  if (done) {
+    completedAt =
+      typeof t.completedAt === 'string' && t.completedAt
+        ? t.completedAt
+        : new Date(typeof t.ts === 'number' ? t.ts : Date.now()).toISOString();
+  }
   const nt = {
     ...t,
     milestones,
@@ -1808,8 +2223,20 @@ function normalizeTask(t) {
     links: t.links || [],
     description: t.description != null ? String(t.description) : '',
     cat: normalizeTaskCat(t.cat),
-    priority: normalizeTaskPriority(t.priority),
-    tagIds: normalizeTagIds(t.tagIds)
+    priority,
+    tagIds: normalizeTagIds(t.tagIds),
+    kind,
+    scheduledOn: normalizeOptionalYmd(t.scheduledOn),
+    deadline: normalizeOptionalYmd(t.deadline),
+    waitingOn: normalizeOptionalString(t.waitingOn),
+    promisedTo: normalizeOptionalString(t.promisedTo),
+    nextCheckAt: normalizeOptionalYmd(t.nextCheckAt),
+    timeEstimateMin: normalizeOptionalMin(t.timeEstimateMin),
+    completedAt,
+    rolloverCount: typeof t.rolloverCount === 'number' && t.rolloverCount >= 0 ? t.rolloverCount : 0,
+    project: normalizeOptionalString(t.project),
+    jiraKey: normalizeOptionalString(t.jiraKey) || hints.jiraKey || null,
+    done
   };
   updateTaskProgress(nt);
   return nt;
@@ -1884,7 +2311,13 @@ function normalizePlannerImport(imported) {
     notes: (imported.notes || []).map(normalizeNote),
     goals: (imported.goals || []).map(g => normalizeGoal({ comments: [], links: [], ...g })),
     journal: (imported.journal || []).map(normalizeJournalEntry),
-    tags: normalizeTagsArray(imported.tags)
+    tags: normalizeTagsArray(imported.tags),
+    settings: normalizeSettings(imported.settings),
+    schemaVersion:
+      typeof imported.schemaVersion === 'number'
+        ? Math.max(imported.schemaVersion, SCHEMA_VERSION)
+        : SCHEMA_VERSION,
+    updatedAt: typeof imported.updatedAt === 'string' ? imported.updatedAt : null
   };
 }
 
@@ -2055,6 +2488,82 @@ function loadTheme() {
   });
 }
 
+function fillCapacitySettingsForm() {
+  const s = normalizeSettings(data.settings);
+  data.settings = s;
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+  set('set-work-day-min', s.workDayMinutes);
+  set('set-comms-min', s.commsBlockMinutes);
+  set('set-lunch-min', s.lunchMinutes);
+  set('set-work-start', s.workDayStart === '11:00' ? '11:00' : '10:00');
+  set('set-max-do', s.maxDoItems);
+  set('set-max-wait', s.maxWaitChecks);
+  set('set-default-est', s.defaultEstimateMin);
+  set('set-wed-first', s.wedOneOnOneRotation.first === 'Mimi' ? 'Mimi' : 'Dima');
+  const dateEl = document.getElementById('set-override-date');
+  if (dateEl && !dateEl.value) dateEl.value = todayYmdLocal();
+  loadDayOverrideForm();
+}
+
+function saveCapacitySettingsFromForm() {
+  const n = (id, fallback) => {
+    const el = document.getElementById(id);
+    const v = el ? Number(el.value) : NaN;
+    return Number.isFinite(v) ? v : fallback;
+  };
+  const s = normalizeSettings(data.settings);
+  s.workDayMinutes = n('set-work-day-min', s.workDayMinutes);
+  s.commsBlockMinutes = n('set-comms-min', s.commsBlockMinutes);
+  s.lunchMinutes = n('set-lunch-min', s.lunchMinutes);
+  s.maxDoItems = n('set-max-do', s.maxDoItems);
+  s.maxWaitChecks = n('set-max-wait', s.maxWaitChecks);
+  s.defaultEstimateMin = n('set-default-est', s.defaultEstimateMin);
+  const start = document.getElementById('set-work-start');
+  s.workDayStart = start && start.value === '11:00' ? '11:00' : '10:00';
+  const wed = document.getElementById('set-wed-first');
+  s.wedOneOnOneRotation = {
+    anchorYmd: (s.wedOneOnOneRotation && s.wedOneOnOneRotation.anchorYmd) || '2026-01-07',
+    first: wed && wed.value === 'Mimi' ? 'Mimi' : 'Dima'
+  };
+  data.settings = normalizeSettings(s);
+  save();
+  if (isPanelActive('today')) renderToday();
+}
+
+function loadDayOverrideForm() {
+  const dateEl = document.getElementById('set-override-date');
+  const minEl = document.getElementById('set-override-min');
+  const noteEl = document.getElementById('set-override-note');
+  if (!dateEl || !minEl || !noteEl) return;
+  const ymd = dateEl.value || todayYmdLocal();
+  dateEl.value = ymd;
+  const map = (data.settings && data.settings.dayOverrides) || {};
+  const o = map[ymd] || {};
+  minEl.value = o.extraMeetingMin != null ? o.extraMeetingMin : 0;
+  noteEl.value = o.note != null ? o.note : '';
+}
+
+function saveDayOverrideFromForm() {
+  const dateEl = document.getElementById('set-override-date');
+  const minEl = document.getElementById('set-override-min');
+  const noteEl = document.getElementById('set-override-note');
+  if (!dateEl || !minEl) return;
+  const ymd = dateEl.value;
+  if (!ymd) return;
+  const s = normalizeSettings(data.settings);
+  const extra = Math.max(0, Number(minEl.value) || 0);
+  const note = noteEl ? noteEl.value.trim() : '';
+  if (!s.dayOverrides || typeof s.dayOverrides !== 'object') s.dayOverrides = {};
+  if (extra <= 0 && !note) delete s.dayOverrides[ymd];
+  else s.dayOverrides[ymd] = { extraMeetingMin: extra, note };
+  data.settings = s;
+  save();
+  if (isPanelActive('today')) renderToday();
+}
+
 function switchTab(tab, btn, opts) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn[data-tab]').forEach(b => b.classList.remove('active'));
@@ -2072,10 +2581,12 @@ function switchTab(tab, btn, opts) {
   if (tab === 'tags') {
     renderTagsPanel();
   }
-  if (tab === 'tasks') renderTasks();
+  if (tab === 'today') renderToday();
+  else if (tab === 'tasks') renderTasks();
   else if (tab === 'goals') renderGoals();
   else if (tab === 'notes') renderNotes();
   else if (tab === 'journal') renderJournal();
+  else if (tab === 'settings') fillCapacitySettingsForm();
   else if (tab === 'search') {
     const gs = document.getElementById('global-search-input');
     if (gs && gs.value.trim()) runGlobalSearch(gs.value);
@@ -2083,46 +2594,95 @@ function switchTab(tab, btn, opts) {
 }
 
 // ── TASKS ──────────────────────────────────────────
-function toggleTaskComposer() {
+function toggleTaskComposer(preset) {
   taskComposerOpen = !taskComposerOpen;
   if (taskComposerOpen) {
     composerDraftCat = 'work';
     composerDraftPriority = 'p3';
     composerDraftTitle = '';
     composerDraftDesc = '';
+    composerDraftPerson = '';
+    applyComposerPreset(preset || (isPanelActive('today') ? 'do' : 'do'), false);
+    if (isPanelActive('today') && !composerDraftWhen) {
+      composerDraftWhen = snapWorkday(todayYmdLocal()) || todayYmdLocal();
+    }
     pendingFocusTaskComposer = true;
   } else {
     composerDraftTitle = '';
     composerDraftDesc = '';
+    composerDraftPerson = '';
+    composerDraftWhen = '';
     pendingFocusTaskComposer = false;
   }
-  renderTasks();
+  refreshTaskLists();
 }
 function cancelTaskComposer() {
   taskComposerOpen = false;
   composerDraftTitle = '';
   composerDraftDesc = '';
+  composerDraftPerson = '';
+  composerDraftWhen = '';
   pendingFocusTaskComposer = false;
-  renderTasks();
+  refreshTaskLists();
+}
+function applyComposerPreset(preset, rerender) {
+  const p = String(preset || 'do').toLowerCase();
+  if (p === 'promise') {
+    composerDraftKind = 'promise';
+    composerDraftPriority = 'p2';
+  } else if (p === 'wait') {
+    composerDraftKind = 'wait';
+    composerDraftPriority = 'p3';
+  } else {
+    composerDraftKind = 'do';
+  }
+  if (isPanelActive('today') && !composerDraftWhen) {
+    composerDraftWhen = snapWorkday(todayYmdLocal()) || todayYmdLocal();
+  }
+  if (rerender !== false) refreshTaskLists();
 }
 function setComposerDraftCat(v) {
   composerDraftCat = normalizeTaskCat(v);
-  renderTasks();
+  refreshTaskLists();
 }
 function syncComposerAddBtn() {
   const inp = document.getElementById('composer-task-title');
   const btn = document.getElementById('composer-add-btn');
   if (!inp || !btn) return;
-  btn.disabled = !inp.value.trim();
+  const personEl = document.getElementById('composer-person');
+  if (personEl) composerDraftPerson = personEl.value;
+  const whenEl = document.getElementById('composer-when');
+  if (whenEl) composerDraftWhen = whenEl.value;
+  let ok = !!inp.value.trim();
+  if (composerDraftKind === 'wait' && !(composerDraftPerson || '').trim()) ok = false;
+  if (composerDraftKind === 'promise' && !(composerDraftPerson || '').trim()) ok = false;
+  btn.disabled = !ok;
 }
 function addTaskFromComposer() {
   const titleEl = document.getElementById('composer-task-title');
   const descEl = document.getElementById('composer-task-desc');
+  const personEl = document.getElementById('composer-person');
+  const whenEl = document.getElementById('composer-when');
   if (!titleEl) return;
   const v = titleEl.value.trim();
   if (!v) return;
+  if (personEl) composerDraftPerson = personEl.value.trim();
+  if (whenEl) composerDraftWhen = whenEl.value;
+  const kind = normalizeKind(composerDraftKind);
+  if ((kind === 'wait' || kind === 'promise') && !composerDraftPerson) return;
+  let when = composerDraftWhen ? snapWorkday(composerDraftWhen) : null;
+  if (isPanelActive('today') && !when && kind !== 'park') {
+    when = snapWorkday(todayYmdLocal()) || todayYmdLocal();
+  }
+  if ((kind === 'do' || kind === 'promise') && when) {
+    const cap = computeCapacityFor(when);
+    if (cap) {
+      const est = (data.settings && data.settings.defaultEstimateMin) || 45;
+      if (!confirmCapacityOverload(cap, cap.doCount + 1, cap.plannedDoMinutes + est)) return;
+    }
+  }
   const tid = uid();
-  data.tasks.push({
+  const raw = {
     id: tid,
     text: v,
     description: descEl ? descEl.value.trim() : '',
@@ -2134,14 +2694,23 @@ function addTaskFromComposer() {
     comments: [],
     links: [],
     progress: 0,
-    ts: Date.now()
-  });
+    ts: Date.now(),
+    kind,
+    scheduledOn: when,
+    waitingOn: kind === 'wait' ? composerDraftPerson : null,
+    promisedTo: kind === 'promise' ? composerDraftPerson : null,
+    nextCheckAt: kind === 'wait' ? when : null,
+    deadline: kind === 'promise' ? when : null
+  };
+  data.tasks.push(normalizeTask(raw));
   taskComposerOpen = false;
   composerDraftTitle = '';
   composerDraftDesc = '';
+  composerDraftPerson = '';
+  composerDraftWhen = '';
   pendingFocusTaskComposer = false;
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function onTaskDescInput(tid) {
   const ta = document.getElementById('task-desc-' + tid);
@@ -2229,7 +2798,13 @@ function saveTaskDescription(id) {
 }
 function toggleTask(id) {
   const t = data.tasks.find(x=>x.id===id);
-  if (t) { t.done=!t.done; save(); renderTasks(); }
+  if (t) {
+    t.done = !t.done;
+    if (t.done) t.completedAt = new Date().toISOString();
+    else t.completedAt = null;
+    save();
+    refreshTaskLists();
+  }
 }
 function delTask(id) {
   data.tasks = data.tasks.filter(x=>x.id!==id);
@@ -2237,7 +2812,191 @@ function delTask(id) {
   delete expandedTasks[id];
   delete taskEditSnapshots[id];
   if (taskSubtaskComposerFor === id) { taskSubtaskComposerFor = null; clearNestedComposerDraft(); }
-  save(); renderTasks();
+  save(); refreshTaskLists();
+}
+function setTaskKind(id, kind) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  flushTaskCardFields(id);
+  const next = normalizeKind(kind);
+  t.kind = next;
+  if (next === 'wait') t.priority = 'p3';
+  save();
+  refreshTaskLists();
+}
+function scheduleTask(id, ymd) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  flushTaskCardFields(id);
+  const snapped = ymd ? snapWorkday(ymd) : null;
+  const nextKind = t.kind === 'park' && snapped ? 'do' : normalizeKind(t.kind);
+  if (snapped && (nextKind === 'do' || nextKind === 'promise')) {
+    const cap = computeCapacityFor(snapped);
+    if (cap) {
+      const already = t.scheduledOn === snapped && (t.kind === 'do' || t.kind === 'promise');
+      if (!already) {
+        const est = Number(t.timeEstimateMin);
+        const addMin = Number.isFinite(est) && est >= 0
+          ? est
+          : ((data.settings && data.settings.defaultEstimateMin) || 45);
+        if (!confirmCapacityOverload(cap, cap.doCount + 1, cap.plannedDoMinutes + addMin)) return;
+      }
+    }
+  }
+  t.scheduledOn = snapped;
+  if (t.kind === 'park' && snapped) t.kind = 'do';
+  save();
+  refreshTaskLists();
+}
+function moveTaskToBacklog(id) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  flushTaskCardFields(id);
+  t.scheduledOn = null;
+  if (t.kind !== 'wait' && t.kind !== 'promise') t.kind = 'park';
+  save();
+  refreshTaskLists();
+}
+function scheduleTaskToday(id) {
+  scheduleTask(id, todayYmdLocal());
+}
+function onTodayFilterChange() {
+  const p = document.getElementById('today-filter-p');
+  const person = document.getElementById('today-filter-person');
+  const jira = document.getElementById('today-filter-jira');
+  todayFilterPriority = p ? p.value : '';
+  todayFilterPerson = person ? person.value.trim().toLowerCase() : '';
+  todayFilterJira = jira ? jira.value.trim().toLowerCase() : '';
+  renderToday();
+}
+function setTodayMode(mode) {
+  todayMode = mode === 'evening' || mode === 'morning' ? mode : 'day';
+  if (todayMode !== 'morning') morningPickIds = {};
+  const title = document.querySelector('#panel-today .tasks-page-title');
+  if (title) {
+    title.textContent = todayMode === 'evening' ? 'Evening clear' : todayMode === 'morning' ? 'Morning plan' : 'Today';
+  }
+  const showBack = todayMode !== 'day';
+  const back = document.getElementById('btn-day-mode');
+  const m = document.getElementById('btn-morning-mode');
+  const e = document.getElementById('btn-evening-mode');
+  if (back) back.style.display = showBack ? '' : 'none';
+  if (m) m.style.display = todayMode === 'day' ? '' : 'none';
+  if (e) e.style.display = todayMode === 'day' ? '' : 'none';
+  const filters = document.getElementById('today-filters');
+  if (filters) filters.style.display = todayMode === 'day' ? '' : 'none';
+  renderToday();
+}
+function bumpRollover(t) {
+  if (!t) return;
+  t.rolloverCount = (typeof t.rolloverCount === 'number' ? t.rolloverCount : 0) + 1;
+}
+function eveningReschedule(id, ymd) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  const snapped = ymd ? snapWorkday(ymd) : null;
+  if (!snapped) return;
+  bumpRollover(t);
+  t.scheduledOn = snapped;
+  save();
+  refreshTaskLists();
+}
+function eveningBacklog(id) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  bumpRollover(t);
+  t.scheduledOn = null;
+  if (t.kind !== 'wait' && t.kind !== 'promise') t.kind = 'park';
+  save();
+  refreshTaskLists();
+}
+function eveningComplete(id) {
+  const t = data.tasks.find(x => x.id === id);
+  if (!t) return;
+  t.done = true;
+  t.completedAt = new Date().toISOString();
+  save();
+  refreshTaskLists();
+}
+function toggleMorningPick(id, on) {
+  if (on) morningPickIds[id] = true;
+  else delete morningPickIds[id];
+}
+function confirmMorningBatch() {
+  const day = todayYmdLocal();
+  const ids = Object.keys(morningPickIds);
+  if (!ids.length) return;
+  const cap = computeCapacityFor(day);
+  const maxDo = (cap && cap.maxDoItems) || 5;
+  const currentDo = cap ? cap.doCount : 0;
+  let add = 0;
+  for (const id of ids) {
+    const t = data.tasks.find(x => x.id === id);
+    if (!t || t.done) continue;
+    const wasDo = t.scheduledOn === day && (t.kind === 'do' || t.kind === 'promise');
+    if (!wasDo) add += 1;
+  }
+  if (cap && currentDo + add > maxDo) {
+    if (!window.confirm(`This would put Do/Promise at ${currentDo + add}/${maxDo}. Continue?`)) return;
+  }
+  for (const id of ids) {
+    const t = data.tasks.find(x => x.id === id);
+    if (!t || t.done) continue;
+    t.scheduledOn = day;
+    if (t.kind === 'park' || !t.kind) t.kind = 'do';
+  }
+  morningPickIds = {};
+  todayMode = 'day';
+  setTodayMode('day');
+  save();
+  refreshTaskLists();
+}
+function morningCandidates(day) {
+  const maxDo = (data.settings && data.settings.maxDoItems) || 5;
+  const onToday = data.tasks.filter(t => isTodayTask(t, day));
+  const leftovers = data.tasks.filter(t => !t.done && t.scheduledOn && t.scheduledOn < day && (t.kind === 'do' || t.kind === 'promise'));
+  const candidates = data.tasks.filter(t => {
+    if (t.done) return false;
+    if (t.scheduledOn === day) return false;
+    if (t.kind === 'wait') return false;
+    const p = normalizeTaskPriority(t.priority);
+    return p === 'p1' || p === 'p2';
+  });
+  // Prefer leftovers, then P1/P2 backlog, unique by id
+  const seen = new Set(onToday.map(t => t.id));
+  const out = [];
+  for (const t of [...leftovers, ...candidates]) {
+    if (seen.has(t.id)) continue;
+    seen.add(t.id);
+    out.push(t);
+  }
+  return { onToday, proposals: out, slots: Math.max(0, maxDo - onToday.filter(t => t.kind === 'do' || t.kind === 'promise').length) };
+}
+function taskMatchesTodayFilters(t) {
+  if (todayFilterPriority && normalizeTaskPriority(t.priority) !== todayFilterPriority) return false;
+  if (todayFilterPerson) {
+    const blob = [t.waitingOn, t.promisedTo, t.text].map(x => String(x || '').toLowerCase()).join(' ');
+    if (!blob.includes(todayFilterPerson)) return false;
+  }
+  if (todayFilterJira) {
+    const jk = String(t.jiraKey || '').toLowerCase();
+    if (!jk.includes(todayFilterJira) && !String(t.text || '').toLowerCase().includes(todayFilterJira)) return false;
+  }
+  return true;
+}
+function isTodayTask(t, day) {
+  if (!t || t.done) return false;
+  if (t.scheduledOn !== day) return false;
+  const k = normalizeKind(t.kind);
+  return k === 'do' || k === 'promise' || k === 'wait';
+}
+function isBacklogOpenTask(t, day) {
+  if (!t || t.done) return false;
+  const k = normalizeKind(t.kind);
+  if (k === 'park') return true;
+  if (!t.scheduledOn) return true;
+  if (t.scheduledOn !== day) return true;
+  return false;
 }
 function setTaskCat(id, cat) {
   const t = data.tasks.find(x => x.id === id);
@@ -2245,7 +3004,7 @@ function setTaskCat(id, cat) {
   flushTaskCardFields(id);
   t.cat = normalizeTaskCat(cat);
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function snapshotTaskFields(t) {
   return JSON.stringify({
@@ -2295,7 +3054,7 @@ function cancelTaskCardEdit(tid) {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function saveTaskCardEdit(tid) {
   flushTaskCardFields(tid);
@@ -2305,7 +3064,7 @@ function saveTaskCardEdit(tid) {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function autoGrowDescTextarea(el) {
   if (!el || el.tagName !== 'TEXTAREA') return;
@@ -2349,7 +3108,7 @@ function setTaskPriority(tid, p) {
 }
 function setComposerDraftPriority(p) {
   composerDraftPriority = normalizeTaskPriority(p);
-  renderTasks();
+  refreshTaskLists();
 }
 function setNestedDraftCat(v) {
   nestedDraftCat = normalizeTaskCat(v);
@@ -2849,6 +3608,34 @@ function taskSummaryPriorityPill(priority) {
   const k = normalizeTaskPriority(priority);
   const lbl = taskPriorityLabel(k);
   return `<span class="card-type-pill priority-pill badge badge-prio-${k}" aria-label="Priority ${esc(lbl)}">${esc(lbl)}</span>`;
+}
+function taskSummaryKindPill(kind) {
+  const k = normalizeKind(kind);
+  return `<span class="card-type-pill kind-pill kind-pill-${k} badge" aria-label="Kind ${esc(k)}">${esc(k)}</span>`;
+}
+function taskTodayMetaLine(t) {
+  const bits = [];
+  if (t.kind === 'promise' && t.promisedTo) bits.push('to ' + t.promisedTo);
+  if (t.kind === 'promise' && t.deadline) bits.push('due ' + t.deadline);
+  if (t.kind === 'wait' && t.waitingOn) bits.push('waiting on ' + t.waitingOn);
+  if (t.kind === 'wait' && t.nextCheckAt) bits.push('check ' + t.nextCheckAt);
+  if (t.jiraKey) bits.push(t.jiraKey);
+  if (!bits.length) return '';
+  return `<div class="today-meta-line">${esc(bits.join(' · '))}</div>`;
+}
+function taskDayToolbarHTML(t) {
+  const k = normalizeKind(t.kind);
+  const when = t.scheduledOn || '';
+  return `<div class="task-day-toolbar" onclick="event.stopPropagation()">
+    <label>Kind <select aria-label="Kind" onchange="setTaskKind('${t.id}', this.value)">
+      ${TASK_KINDS.map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${x}</option>`).join('')}
+    </select></label>
+    <label>When <input type="date" aria-label="Schedule date" value="${esc(when)}" onchange="scheduleTask('${t.id}', this.value)"></label>
+    <button type="button" class="btn btn--outline btn--dense" onclick="scheduleTaskToday('${t.id}')">Today</button>
+    <button type="button" class="btn btn--outline btn--dense" onclick="moveTaskToBacklog('${t.id}')">Backlog</button>
+    ${k === 'wait' ? `<input type="text" placeholder="Waiting on…" value="${esc(t.waitingOn || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.waitingOn=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
+    ${k === 'promise' ? `<input type="text" placeholder="Promised to…" value="${esc(t.promisedTo || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.promisedTo=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
+  </div>`;
 }
 function ensureTagsArray() {
   if (!Array.isArray(data.tags)) data.tags = [];
@@ -3456,7 +4243,15 @@ function taskComposerHTML() {
   const k = composerDraftCat;
   const L = taskCatLabels();
   const keys = ['work', 'personal', 'urgent'];
+  const kind = normalizeKind(composerDraftKind);
+  const needPerson = kind === 'wait' || kind === 'promise';
+  const whenVal = composerDraftWhen || '';
   return `<div class="new-task-card" id="task-composer-card">
+    <div class="today-composer-presets" role="group" aria-label="Capture preset">
+      <button type="button" class="btn btn--outline btn--dense${kind === 'do' ? ' active' : ''}" onclick="applyComposerPreset('do')">Quick Do</button>
+      <button type="button" class="btn btn--outline btn--dense${kind === 'promise' ? ' active' : ''}" onclick="applyComposerPreset('promise')">Promise</button>
+      <button type="button" class="btn btn--outline btn--dense${kind === 'wait' ? ' active' : ''}" onclick="applyComposerPreset('wait')">Waiting on…</button>
+    </div>
     <input type="text" id="composer-task-title" class="new-task-title-input" placeholder="Task name" maxlength="500" autocomplete="off" value="${esc(composerDraftTitle)}"
       onkeydown="if(event.key==='Enter'){event.preventDefault();addTaskFromComposer();}"
       oninput="syncComposerAddBtn()">
@@ -3465,10 +4260,12 @@ function taskComposerHTML() {
       onclick="event.stopPropagation()" onfocus="onComposerDescFocus()" oninput="onComposerDescInput()" onblur="onComposerDescBlur()">${esc(composerDraftDesc)}</textarea>
     <div id="composer-task-desc-preview" class="task-desc-preview" onclick="focusComposerDescFromPreview(event)" onmousedown="if(!event.target.closest('a.task-desc-link'))event.stopPropagation()"${!String(composerDraftDesc).trim() ? ' style="display:none"' : ''}>${descPreviewInnerHTML(composerDraftDesc)}</div>
     </div>
+    ${needPerson || isPanelActive('today') ? `<div class="new-task-tertiary-row" style="gap:8px">
+      ${needPerson ? `<input type="text" id="composer-person" placeholder="${kind === 'wait' ? 'Waiting on…' : 'Promised to…'}" value="${esc(composerDraftPerson)}" oninput="syncComposerAddBtn()" style="flex:1;min-width:120px;font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)">` : ''}
+      <input type="date" id="composer-when" aria-label="Schedule date" value="${esc(whenVal)}" onchange="composerDraftWhen=this.value;syncComposerAddBtn()">
+    </div>` : ''}
     <div class="new-task-tertiary-row">
       ${composerPriorityDropdownHTML()}
-      <button type="button" class="btn btn--outline btn--dense" disabled title="Coming soon">Date</button>
-      <button type="button" class="btn btn--outline btn--dense" disabled title="Coming soon">Reminder</button>
       <div class="composer-cat-row composer-cat-row--contents" role="group" aria-label="Category">
         ${keys.map(v => `<button type="button" class="composer-cat-pill ${v}${k === v ? ' active' : ''}" onclick="setComposerDraftCat('${v}')">${esc(L[v])}</button>`).join('')}
       </div>
@@ -3510,10 +4307,9 @@ function taskExpandedBodyHTML(t) {
       </div>
       <div class="task-edit-toolbar">
         ${taskPriorityDropdownHTML(t.id, p)}
-        <button type="button" class="btn btn--outline btn--dense" disabled title="Coming soon">Date</button>
-        <button type="button" class="btn btn--outline btn--dense" disabled title="Coming soon">Reminder</button>
         <div class="task-edit-toolbar-cats">${taskCatPillsHTML(t.id, t.cat)}</div>
       </div>
+      ${taskDayToolbarHTML(t)}
       <div class="task-tags-block" onclick="event.stopPropagation()">
         <div class="task-tags-label">Tags</div>
         ${taskTagsPickerHTML(t.id)}
@@ -3874,9 +4670,10 @@ function taskItemHTML(t) {
         <div class="task-row-line1">
           <div class="task-row-summary-textrow">
             <div class="goal-title task-row-title task-title-editable ${t.done ? 'done' : ''}" ondblclick="onTaskTitleDblClick('${t.id}',event)" title="Double-click to expand">${esc(t.text)}</div>
-            <span class="task-row-pills">${taskSummaryPriorityPill(t.priority)}${taskSummaryTypePill(t.cat)}</span>
+            <span class="task-row-pills">${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}${taskSummaryTypePill(t.cat)}</span>
           </div>
         </div>
+        ${taskTodayMetaLine(t)}
         ${taskRowTagsLineHTML(t)}
       </div>
     </div>
@@ -3916,17 +4713,17 @@ function commitTaskEdit(id, input) {
   const cancelled = input.dataset.cancel === '1';
   const t = data.tasks.find(x => x.id === id);
   if (cancelled || !t) {
-    renderTasks();
+    refreshTaskLists();
     return;
   }
   const v = input.value.trim();
   if (!v) {
-    renderTasks();
+    refreshTaskLists();
     return;
   }
   t.text = v;
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 
 function beginGoalEdit(id) {
@@ -4045,6 +4842,160 @@ function saveTaskLinkEdit(tid, mid, lid) {
   renderTasks();
 }
 
+function renderToday() {
+  snapshotNestedComposerDraft();
+  snapshotTaskComposerDraft();
+  const el = document.getElementById('today-list');
+  const capEl = document.getElementById('today-cap');
+  if (!el) return;
+  const day = todayYmdLocal();
+
+  if (todayMode === 'evening') {
+    if (capEl) {
+      capEl.className = 'today-cap-stub';
+      capEl.innerHTML = 'Incomplete Today items — reschedule, backlog, or complete. Nothing stays silently for tomorrow.';
+    }
+    const leftovers = data.tasks.filter(t => isTodayTask(t, day));
+    const parts = [];
+    if (!leftovers.length) {
+      parts.push('<div class="task-list-empty-hint">Today is clear. Nice.</div>');
+    } else {
+      for (const t of leftovers) {
+        const zombie = (t.rolloverCount || 0) >= 3;
+        const nextMon = snapWorkday(
+          (() => {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            return todayYmdLocal(d);
+          })()
+        ) || day;
+        parts.push(`<div class="today-triage-row${zombie ? ' is-zombie' : ''}">
+          <div class="triage-title">${esc(t.text)} ${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}${(t.rolloverCount || 0) ? `<span class="today-meta-line">rollovers ${t.rolloverCount}</span>` : ''}</div>
+          <div class="today-triage-actions">
+            <input type="date" id="eve-date-${t.id}" value="${esc(nextMon)}" aria-label="Reschedule date">
+            <button type="button" class="btn btn--outline btn--dense" onclick="eveningReschedule('${t.id}', document.getElementById('eve-date-${t.id}').value)">Reschedule</button>
+            <button type="button" class="btn btn--outline btn--dense" onclick="eveningBacklog('${t.id}')">Backlog</button>
+            <button type="button" class="btn btn--primary btn--dense" onclick="eveningComplete('${t.id}')">Complete</button>
+          </div>
+        </div>`);
+      }
+    }
+    el.innerHTML = parts.join('');
+    return;
+  }
+
+  if (todayMode === 'morning') {
+    const { onToday, proposals, slots } = morningCandidates(day);
+    if (capEl) {
+      capEl.className = 'today-cap-stub';
+      capEl.innerHTML = `Scheduled today: <strong>${onToday.length}</strong> · open Do slots ≈ <strong>${slots}</strong>. Pick leftovers / P1–P2 to fill, then confirm.`;
+    }
+    const parts = [];
+    parts.push('<div class="task-section-head">Already on Today</div>');
+    if (!onToday.length) parts.push('<div class="task-list-empty-hint">Nothing scheduled yet.</div>');
+    else parts.push(onToday.map(t => `<div class="today-triage-row"><div class="triage-title">${esc(t.text)} ${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}</div></div>`).join(''));
+    parts.push('<div class="task-section-head">Candidates</div>');
+    if (!proposals.length) parts.push('<div class="task-list-empty-hint">No P1–P2 / leftover candidates.</div>');
+    else {
+      for (const t of proposals) {
+        const checked = morningPickIds[t.id] ? 'checked' : '';
+        const why = t.scheduledOn && t.scheduledOn < day ? 'leftover' : normalizeTaskPriority(t.priority);
+        parts.push(`<div class="today-triage-row">
+          <label class="triage-title" style="display:flex;gap:8px;align-items:flex-start;cursor:pointer">
+            <input type="checkbox" ${checked} onchange="toggleMorningPick('${t.id}', this.checked)">
+            <span>${esc(t.text)} ${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)} <span class="today-meta-line">${esc(why)}</span></span>
+          </label>
+        </div>`);
+      }
+      parts.push(`<div style="margin-top:12px"><button type="button" class="btn btn--primary" onclick="confirmMorningBatch()">Confirm batch → Today</button></div>`);
+    }
+    el.innerHTML = parts.join('');
+    return;
+  }
+
+  const maxDo = (data.settings && data.settings.maxDoItems) || 5;
+  const maxWait = (data.settings && data.settings.maxWaitChecks) || 5;
+  const pool = data.tasks.filter(t => isTodayTask(t, day)).filter(taskMatchesTodayFilters);
+  const dos = pool.filter(t => normalizeKind(t.kind) === 'do');
+  const promises = pool.filter(t => normalizeKind(t.kind) === 'promise');
+  const waits = pool.filter(t => normalizeKind(t.kind) === 'wait');
+  const doCount = dos.length + promises.length;
+  const dayCap = computeCapacityFor(day);
+  if (dayCap) {
+    const pct = dayCap.availableDoMinutes > 0
+      ? Math.min(100, Math.round((dayCap.plannedDoMinutes / dayCap.availableDoMinutes) * 100))
+      : (dayCap.plannedDoMinutes > 0 ? 100 : 0);
+    const meetTitles = (dayCap.meetingBlocks || []).map(b => b.title + ' ' + b.minutes + 'm').join(' · ');
+    if (capEl) {
+      capEl.className = 'today-cap-stub' + (dayCap.overload ? ' is-overload' : '');
+      capEl.innerHTML =
+        `<strong>${esc(day)}</strong> · Do/Promise <strong>${dayCap.doCount}</strong>/${dayCap.maxDoItems}` +
+        ` · <strong>${dayCap.plannedDoMinutes}</strong>/${dayCap.availableDoMinutes}m Do` +
+        ` · Wait <strong>${dayCap.waitCount}</strong>/${dayCap.maxWaitChecks}` +
+        ` · Meetings <strong>${dayCap.meetingMinutes}</strong>m` +
+        (dayCap.overload ? ' · <span style="color:#c44">overload</span>' : '') +
+        `<div class="today-cap-meter${dayCap.overloadMinutes ? ' is-over' : ''}" title="Planned Do vs available"><span style="width:${pct}%"></span></div>` +
+        (meetTitles ? `<div class="today-cap-blocks">${esc(meetTitles)}</div>` : '');
+    }
+  } else if (capEl) {
+    capEl.className = 'today-cap-stub';
+    capEl.innerHTML = `<strong>${esc(day)}</strong> · Do/Promise <strong>${doCount}</strong>/${maxDo}` +
+      ` · Wait checks <strong>${waits.length}</strong>/${maxWait}`;
+  }
+  const parts = [];
+  const section = (title, items, cls) => {
+    parts.push(`<div class="${cls || ''}"><div class="task-section-head">${title} (${items.length})</div>`);
+    if (!items.length) parts.push('<div class="task-list-empty-hint">None</div>');
+    else parts.push(items.map(taskItemHTML).join(''));
+    parts.push('</div>');
+  };
+  section('Do', dos, 'today-section-do');
+  section('Promise', promises, 'today-section-promise');
+  section('Wait', waits, 'today-section-wait');
+  parts.push('<div class="task-section-head" style="margin-top:20px">Not on Today</div>');
+  parts.push('<div class="task-list-empty-hint"><button type="button" class="btn btn--outline btn--dense" onclick="switchTab(\'tasks\')">Open backlog (Tasks)</button></div>');
+  if (isPanelActive('today')) {
+    parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer(\'do\')"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add to Today</button>');
+    parts.push(taskComposerHTML());
+  }
+  el.innerHTML = parts.join('');
+  const focusTaskTitleId = pendingFocusTaskTitleId;
+  if (isPanelActive('today')) pendingFocusTaskTitleId = null;
+  if (taskComposerOpen && isPanelActive('today')) {
+    requestAnimationFrame(() => {
+      syncComposerAddBtn();
+      const focusComposerTitle = pendingFocusTaskComposer;
+      pendingFocusTaskComposer = false;
+      if (focusComposerTitle) {
+        const inp = document.getElementById('composer-task-title');
+        if (inp) {
+          inp.focus();
+          if (typeof inp.setSelectionRange === 'function') {
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+          }
+        }
+      }
+    });
+  }
+  requestAnimationFrame(() => {
+    if (isPanelActive('today') && focusTaskTitleId) {
+      const inp = document.getElementById('task-title-inp-' + focusTaskTitleId);
+      if (inp) {
+        inp.focus();
+        if (inp.classList && inp.classList.contains('task-main-title-field')) autoGrowDescTextarea(inp);
+      }
+    }
+    data.tasks.forEach(t => {
+      if (expandedTasks[t.id] && isTodayTask(t, day)) {
+        updateTaskDescPreview(t.id);
+        const tinp = document.getElementById('task-title-inp-' + t.id);
+        if (tinp && tinp.classList && tinp.classList.contains('task-main-title-field')) autoGrowDescTextarea(tinp);
+      }
+    });
+  });
+}
+
 function renderTasks() {
   snapshotNestedComposerDraft();
   snapshotTaskComposerDraft();
@@ -4053,23 +5004,26 @@ function renderTasks() {
   const statsEl = document.getElementById('task-stats');
   const el = document.getElementById('task-list');
   if (!statsEl || !el) return;
-  const rawOpenCount = data.tasks.filter(x => !x.done).length;
+  const day = todayYmdLocal();
+  const backlogOpenAll = data.tasks.filter(x => isBacklogOpenTask(x, day));
   const pool = data.tasks.filter(taskMatchesActiveTagFilters);
-  const open = pool.filter(x => !x.done);
+  const open = pool.filter(x => isBacklogOpenTask(x, day));
   const done = pool.filter(x => x.done);
-  const total = pool.length;
+  const total = open.length + done.length;
   statsEl.innerHTML = `
-    <div class="stat"><div class="stat-num">${open.length}</div><div class="stat-lbl">Open</div></div>
+    <div class="stat"><div class="stat-num">${open.length}</div><div class="stat-lbl">Backlog</div></div>
     <div class="stat"><div class="stat-num">${done.length}</div><div class="stat-lbl">Done</div></div>
     <div class="stat"><div class="stat-num">${total ? Math.round(done.length/total*100) : 0}%</div><div class="stat-lbl">Complete</div></div>`;
   const parts = [];
-  parts.push('<div class="task-section-head">Open</div>');
+  parts.push('<div class="task-section-head">Backlog</div>');
   if (!open.length) {
-    const msg = !rawOpenCount ? 'No open tasks.' : (taskTagFilterIds.length ? 'No open tasks match the filter.' : 'No open tasks.');
+    const msg = !backlogOpenAll.length ? 'No backlog tasks.' : (taskTagFilterIds.length ? 'No backlog tasks match the filter.' : 'No backlog tasks.');
     parts.push('<div class="task-list-empty-hint">' + msg + '</div>');
   } else parts.push(open.map(taskItemHTML).join(''));
-  parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer()"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add Task</button>');
-  parts.push(taskComposerHTML());
+  if (isPanelActive('tasks')) {
+    parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer()"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add Task</button>');
+    parts.push(taskComposerHTML());
+  }
   if (done.length) {
     parts.push('<div class="task-section-head task-section-complete">Complete</div>');
     parts.push(done.map(taskItemHTML).join(''));
@@ -4079,7 +5033,7 @@ function renderTasks() {
   const focusNestedSubtaskTid = pendingFocusNestedSubtaskTid;
   pendingFocusTaskTitleId = null;
   pendingFocusNestedSubtaskTid = null;
-  if (taskComposerOpen) {
+  if (taskComposerOpen && isPanelActive('tasks')) {
     requestAnimationFrame(() => {
       syncComposerAddBtn();
       const focusComposerTitle = pendingFocusTaskComposer;
@@ -5298,6 +6252,104 @@ function scrollAndFlash(domId) {
   });
 }
 
+function thingsTagsList(item) {
+  const raw = item.tags || item.tag || [];
+  if (!Array.isArray(raw)) return [String(raw)];
+  return raw.map((t) => (typeof t === 'string' ? t : (t && t.name) || '')).filter(Boolean);
+}
+
+function mapThingsItemToTask(item) {
+  const title = String(item.title || item.text || item.name || '').trim();
+  if (!title) return null;
+  const tags = thingsTagsList(item).map((t) => t.toLowerCase());
+  let kind = 'do';
+  if (tags.some((t) => t === 'wait' || t === 'waiting')) kind = 'wait';
+  else if (tags.some((t) => t === 'promise')) kind = 'promise';
+  else if (tags.some((t) => t === 'park' || t === 'someday')) kind = 'park';
+  let priority = null;
+  for (const p of ['p1', 'p2', 'p3', 'p4']) {
+    if (tags.includes(p)) priority = p;
+  }
+  const hints = parseTaskTitleHints(title);
+  if (!priority && hints.priorityFromTitle) priority = hints.priorityFromTitle;
+  if (kind === 'do' && hints.kindFromTitle) kind = normalizeKind(hints.kindFromTitle);
+  if (kind === 'wait') priority = 'p3';
+  const when = item.when || item.activation || item.scheduledOn || item.startDate || null;
+  const deadline = item.deadline || item.due || null;
+  const notes = item.notes != null ? String(item.notes) : (item.description != null ? String(item.description) : '');
+  const checklist = item.checklist || item.checklistItems || item.milestones || [];
+  const milestones = Array.isArray(checklist)
+    ? checklist.map((c) => ({
+        id: uid(),
+        text: typeof c === 'string' ? c : String(c.title || c.text || ''),
+        description: '',
+        priority: priority || 'p3',
+        cat: 'work',
+        done: !!(c && c.done),
+        comments: [],
+        links: [],
+        tagIds: []
+      })).filter((m) => m.text)
+    : [];
+  return normalizeTask({
+    id: uid(),
+    text: title,
+    description: notes,
+    cat: 'work',
+    priority: priority || 'p3',
+    done: !!(item.done || item.completed),
+    milestones,
+    comments: [],
+    links: [],
+    tagIds: [],
+    ts: Date.now(),
+    kind,
+    scheduledOn: when ? snapWorkday(String(when).slice(0, 10)) : null,
+    deadline: deadline ? String(deadline).slice(0, 10) : null,
+    project: item.project || item.area || item.areaName || null,
+    jiraKey: hints.jiraKey || null,
+    waitingOn: kind === 'wait' ? (item.waitingOn || null) : null,
+    promisedTo: kind === 'promise' ? (item.promisedTo || null) : null
+  });
+}
+
+function importThingsDump(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const status = document.getElementById('things-import-status');
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      let items = [];
+      if (Array.isArray(parsed)) items = parsed;
+      else if (Array.isArray(parsed.items)) items = parsed.items;
+      else if (Array.isArray(parsed.tasks)) items = parsed.tasks;
+      else if (Array.isArray(parsed.todos)) items = parsed.todos;
+      else {
+        alert('Unrecognized Things dump shape. Need an array or { items/tasks: [...] }.');
+        return;
+      }
+      const mapped = items.map(mapThingsItemToTask).filter(Boolean);
+      if (!mapped.length) {
+        alert('No importable tasks found.');
+        return;
+      }
+      if (!confirm(`Import ${mapped.length} item(s) into Planner (merge, not replace)?`)) return;
+      if (!Array.isArray(data.tasks)) data.tasks = [];
+      data.tasks.push(...mapped);
+      await flushPersistNow();
+      renderAll();
+      if (status) status.textContent = `Imported ${mapped.length} task(s).`;
+    } catch (err) {
+      alert('Could not parse Things JSON.');
+      if (status) status.textContent = 'Import failed.';
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 function importData(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -5326,6 +6378,7 @@ function importData(event) {
 
 function renderAll() {
   ensureDataShape();
+  renderToday();
   renderTasks();
   renderNotes();
   renderGoals();
