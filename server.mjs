@@ -69,12 +69,27 @@ async function saveState(state) {
   return normalized;
 }
 
+function cors(res) {
+  // file:// Origin is "null"; allow so Finder-opened planner.html can talk to this process.
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Private-Network', 'true');
+}
+
 function json(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(body));
 }
 
 const server = http.createServer(async (req, res) => {
+  cors(res);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   const url = new URL(req.url || '/', `http://127.0.0.1:${PORT}`);
 
   try {

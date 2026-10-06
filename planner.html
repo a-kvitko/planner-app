@@ -362,30 +362,41 @@
 
   /* Tasks, Goals & Journal panels — Figma Widgets */
   #panel-tasks.tasks-panel-figma,
+  #panel-logbook.tasks-panel-figma,
   #panel-goals.goals-panel-figma,
   #panel-journal.journal-panel-figma {
     width: 100%;
     max-width: 728px;
     min-width: 0;
     box-sizing: border-box;
+  }
+  /* Goals/journal keep clip; tasks must not — drag gutter hangs at left: -24px like Today */
+  #panel-goals.goals-panel-figma,
+  #panel-journal.journal-panel-figma {
     overflow-x: clip;
   }
   #panel-tasks .tasks-page-head,
+  #panel-logbook .tasks-page-head,
   #panel-goals .goals-page-head,
   #panel-journal .journal-page-head { padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
   #panel-tasks .tasks-page-title,
+  #panel-logbook .tasks-page-title,
   #panel-goals .goals-page-title,
   #panel-journal .journal-page-title { font-size: 22px; font-weight: 500; margin: 0; }
   #panel-tasks .stats-row.tasks-stats-figma,
+  #panel-logbook .stats-row.tasks-stats-figma,
   #panel-goals .stats-row.goals-stats-figma,
   #panel-journal .stats-row.journal-stats-figma { gap: 14px; margin-bottom: 24px; padding-top: 17px; }
   #panel-tasks .stats-row.tasks-stats-figma .stat,
+  #panel-logbook .stats-row.tasks-stats-figma .stat,
   #panel-goals .stats-row.goals-stats-figma .stat,
   #panel-journal .stats-row.journal-stats-figma .stat { border-radius: 14px; border: none; padding: 14px 16px; background: var(--surface); }
   #panel-tasks .stats-row.tasks-stats-figma .stat-num,
+  #panel-logbook .stats-row.tasks-stats-figma .stat-num,
   #panel-goals .stats-row.goals-stats-figma .stat-num,
   #panel-journal .stats-row.journal-stats-figma .stat-num { font-size: 26px; font-weight: 600; }
   #panel-tasks .stats-row.tasks-stats-figma .stat-lbl,
+  #panel-logbook .stats-row.tasks-stats-figma .stat-lbl,
   #panel-goals .stats-row.goals-stats-figma .stat-lbl,
   #panel-journal .stats-row.journal-stats-figma .stat-lbl { font-size: 13px; text-transform: none; letter-spacing: 0; color: var(--text3); margin-top: 2px; }
   .task-dashboard-wrap.is-collapsed,
@@ -479,17 +490,31 @@
     border-radius: 6px; background: var(--bg); color: var(--text);
   }
   .today-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; align-items: center; }
-  .today-filters input, .today-filters select {
+  .today-filters input {
     font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--border);
     border-radius: 6px; background: var(--bg); color: var(--text);
   }
   .today-filters input { min-width: 120px; }
+  .today-prio-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .today-prio-chip {
+    font: inherit; font-size: 12px; font-weight: 600; line-height: 1;
+    height: 28px; padding: 0 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text2);
+    opacity: 0.7; transition: opacity .12s, border-color .12s, background .12s, color .12s;
+  }
+  .today-prio-chip:hover { opacity: 0.95; }
+  .today-prio-chip.active { opacity: 1; border-color: var(--text); color: var(--text); }
+  .today-prio-chip.p1.active { background: var(--prio-p1-bg); color: var(--prio-p1-text); border-color: transparent; }
+  .today-prio-chip.p2.active { background: var(--prio-p2-bg); color: var(--prio-p2-text); border-color: transparent; }
+  .today-prio-chip.p3.active { background: var(--prio-p3-bg); color: var(--prio-p3-text); border-color: transparent; }
+  .today-prio-chip.p4.active { background: var(--prio-p4-bg); color: var(--prio-p4-text); border-color: transparent; }
   .today-composer-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
   .today-section-wait .task-section-head { opacity: 0.85; }
   .today-section-wait .task-item-figma { opacity: 0.88; }
   .kind-pill { text-transform: capitalize; }
   .kind-pill-wait { opacity: 0.75; }
   .today-meta-line { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .task-row-inner > .today-meta-line { margin-top: -8px; line-height: 1.25; }
   .task-day-toolbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
   .task-day-toolbar input[type="date"],
   .task-day-toolbar input[type="text"],
@@ -503,7 +528,12 @@
   #journal-list {
     min-width: 0;
     max-width: 100%;
-    overflow-x: clip;
+    overflow: visible;
+  }
+  .task-edit-card,
+  .task-edit-toolbar,
+  .task-expanded-under.new-task-card.task-expanded-card {
+    overflow: visible;
   }
   .task-item-figma,
   .goal-item-figma,
@@ -513,6 +543,7 @@
     min-width: 0;
     max-width: 100%;
   }
+  .task-item-figma { margin-bottom: 8px; }
   /* Entire row (incl. priority dropdown) stacks above following items — later siblings paint on top by default */
   .task-item-figma:has(.card-expanded.open),
   .goal-item-figma:has(.card-expanded.open),
@@ -555,7 +586,7 @@
     border-radius: 6px;
     margin: 0;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: auto;
     transition: opacity .15s ease;
     z-index: 2;
   }
@@ -569,14 +600,13 @@
   .goal-item-figma:hover .goal-drag-handle,
   .goal-item-figma.goal-item-dragging .goal-drag-handle {
     opacity: 1;
-    pointer-events: auto;
   }
   .task-drag-handle:hover,
   .goal-drag-handle:hover { color: var(--text2); background: var(--surface2); }
   .task-drag-handle:active,
   .goal-drag-handle:active { cursor: grabbing; }
   .task-drag-handle:focus-visible,
-  .goal-drag-handle:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--blue); outline-offset: 1px; }
+  .goal-drag-handle:focus-visible { opacity: 1; outline: 2px solid var(--blue); outline-offset: 1px; }
   .task-drag-handle svg,
   .goal-drag-handle svg { display: block; opacity: .75; }
   .task-item-figma.task-item-dragging,
@@ -592,12 +622,11 @@
     z-index: 1;
     flex: 1;
     min-width: 0;
-    min-height: 40px;
+    min-height: 36px;
     display: flex;
     flex-direction: column;
   }
   .task-item-figma-body {
-    margin-bottom: 8px;
     align-items: flex-start;
   }
   .task-item-figma:not(:has(.card-expanded.open)) .task-item-figma-body,
@@ -703,7 +732,7 @@
   }
   .task-desc-field.is-editing-desc .task-desc-preview,
   .task-desc-field.is-empty-desc .task-desc-preview { display: none !important; }
-  .task-desc-preview { font-size: 13px; line-height: 20px; color: var(--text); word-break: break-word; cursor: text; }
+  .task-desc-preview { font-size: 14px; line-height: 20px; color: var(--text); word-break: break-word; cursor: text; }
   .task-desc-preview:empty { display: none; }
   a.task-desc-link { color: var(--blue); text-decoration: underline; cursor: pointer; }
   a.task-desc-link:hover { color: #1d4ed8; }
@@ -826,14 +855,15 @@
   .task-edit-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 10px; }
   .task-edit-toolbar .composer-cat-row { margin: 0; }
   .btn.btn--outline.btn--dense:disabled { opacity: 0.85; color: var(--text3); }
-  .task-prio-details { position: relative; }
+  .task-prio-details { position: relative; z-index: 20; }
+  .task-prio-details[open] { z-index: 120; }
   .task-prio-details > summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 4px 8px; border-radius: 4px; border: 1px solid #d3d5db; background: #fff; color: var(--text); height: 26px; }
   .task-prio-details > summary::-webkit-details-marker { display: none; }
   .task-prio-panel {
     position: absolute;
     left: 0;
     top: calc(100% + 4px);
-    z-index: 100;
+    z-index: 130;
     box-sizing: border-box;
     width: 70px;
     max-width: 70px;
@@ -939,6 +969,24 @@
   .card-chevron.open { background-image: url("assets/icons/chevron-up.png"); }
   .card-expanded { display: none; border: none; border-image: none; }
   .card-expanded.open { display: block; }
+  /* Expand/collapse motion (View Transitions); keep root still so only cards morph */
+  @media (prefers-reduced-motion: no-preference) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation-duration: 0.001ms;
+      animation-timing-function: linear;
+    }
+    ::view-transition-group(*) {
+      animation-duration: 0.3s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation-duration: 0.22s;
+      animation-timing-function: ease;
+      mix-blend-mode: normal;
+    }
+  }
   .goal-header { padding: 14px 16px 12px; display: flex; gap: 10px; align-items: flex-start; }
   .goal-info { flex: 1; min-width: 0; }
   .goal-title { font-size: 15px; font-weight: 500; }
@@ -1081,20 +1129,62 @@
     color: var(--text);
     background: var(--surface2);
   }
-  .tag-manager-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .tag-manager-list { display: flex; flex-direction: column; margin-top: 12px; overflow: visible; }
   .tag-manager-row {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 12px 14px;
+    flex-direction: row;
+    align-items: stretch;
+    position: relative;
+    min-width: 0;
+    margin-bottom: 8px;
   }
+  .tag-manager-row::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+  }
+  .tag-manager-row:hover .task-drag-handle,
+  .tag-manager-row.tag-item-dragging .task-drag-handle { opacity: 1; }
+  .tag-manager-row.tag-item-dragging { opacity: .45; }
+  .tag-manager-row.tag-drop-before { box-shadow: inset 0 3px 0 0 var(--blue); }
+  .tag-manager-row.tag-drop-after { box-shadow: inset 0 -3px 0 0 var(--blue); }
+  .tag-manager-row-figma {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    width: 100%;
+    min-width: 0;
+    padding: 0 4px 0 0;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    transition: background .12s;
+  }
+  .tag-manager-row:hover .tag-manager-row-figma { background: #F5F4F0; }
+  [data-theme="dark"] .tag-manager-row:hover .tag-manager-row-figma { background: #353431; }
   .tag-manager-row .tag-rename-input {
     flex: 1;
-    min-width: 140px;
+    min-width: 120px;
     margin: 0;
+    font: inherit;
+    font-size: 15px;
+    color: var(--text);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: transparent;
+    box-sizing: border-box;
   }
-  .tag-manager-row-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .tag-manager-row .tag-rename-input:hover { border-color: var(--border); }
+  .tag-manager-row .tag-rename-input:focus {
+    outline: none;
+    border-color: var(--border2);
+    background: var(--surface);
+  }
+  .tag-manager-row .task-edit-trash-btn { flex-shrink: 0; }
 
   /* Section tag filter (dashboard → list) */
   .section-tag-filter-wrap {
@@ -1152,9 +1242,27 @@
     margin-top: 8px;
     align-items: center;
   }
+  .file-origin-banner {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    padding: 10px 14px;
+    background: #fff3cd;
+    color: #5c4b00;
+    border-bottom: 1px solid #e6d59a;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .file-origin-banner a { color: inherit; font-weight: 600; }
 </style>
 </head>
 <body>
+<div id="file-origin-banner" class="file-origin-banner" role="status">
+  Local server is off, so this tab is using a separate browser store.
+  Run <code>npm start</code> and reload — it will jump to
+  <a href="http://127.0.0.1:3847/">http://127.0.0.1:3847/</a> (same <code>planner-data.json</code>).
+</div>
 <div class="app">
   <nav class="sidebar">
     <div class="logo">Plan·ME</div>
@@ -1169,6 +1277,10 @@
     <button type="button" class="nav-btn" data-tab="tasks" onclick="switchTab('tasks', this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
       Tasks
+    </button>
+    <button type="button" class="nav-btn" data-tab="logbook" onclick="switchTab('logbook', this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2.5h8.5a1.5 1.5 0 011.5 1.5v9a1 1 0 01-1 1H4.5A1.5 1.5 0 013 12.5v-10z"/><path d="M3 2.5A1.5 1.5 0 014.5 1H5v12.5"/><path d="M6.5 5h4M6.5 8h4M6.5 11h2.5"/></svg>
+      Logbook
     </button>
     <button type="button" class="nav-btn" data-tab="notes" onclick="switchTab('notes', this, { focusNoteForm: true })">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 2h10v10l-3 2H3z"/><path d="M6 6h4M6 9h2"/></svg>
@@ -1209,20 +1321,20 @@
       <div class="tasks-page-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <h1 class="tasks-page-title" style="margin:0">Today</h1>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button type="button" class="btn btn--outline btn--dense" id="btn-morning-mode" onclick="setTodayMode('morning')">Morning</button>
-          <button type="button" class="btn btn--outline btn--dense" id="btn-evening-mode" onclick="setTodayMode('evening')">Evening clear</button>
-          <button type="button" class="btn btn--outline btn--dense" id="btn-day-mode" onclick="setTodayMode('day')" style="display:none">Back to Today</button>
+          <button type="button" class="btn btn-sm btn--soft" id="btn-morning-mode" onclick="setTodayMode('morning')">Morning</button>
+          <button type="button" class="btn btn-sm btn--soft" id="btn-evening-mode" onclick="setTodayMode('evening')">Evening clear</button>
+          <button type="button" class="btn btn-sm btn--soft" id="btn-day-mode" onclick="setTodayMode('day')" style="display:none">Back to Today</button>
         </div>
       </div>
       <div id="today-cap" class="today-cap-stub"></div>
       <div class="today-filters" id="today-filters">
-        <select id="today-filter-p" aria-label="Priority filter" onchange="onTodayFilterChange()">
-          <option value="">All P</option>
-          <option value="p1">P1</option>
-          <option value="p2">P2</option>
-          <option value="p3">P3</option>
-          <option value="p4">P4</option>
-        </select>
+        <div class="today-prio-chips" id="today-prio-chips" role="group" aria-label="Priority filter">
+          <button type="button" class="today-prio-chip active" data-p="" onclick="setTodayPriorityFilter('')" aria-pressed="true">All</button>
+          <button type="button" class="today-prio-chip p1" data-p="p1" onclick="setTodayPriorityFilter('p1')" aria-pressed="false">P1</button>
+          <button type="button" class="today-prio-chip p2" data-p="p2" onclick="setTodayPriorityFilter('p2')" aria-pressed="false">P2</button>
+          <button type="button" class="today-prio-chip p3" data-p="p3" onclick="setTodayPriorityFilter('p3')" aria-pressed="false">P3</button>
+          <button type="button" class="today-prio-chip p4" data-p="p4" onclick="setTodayPriorityFilter('p4')" aria-pressed="false">P4</button>
+        </div>
         <input type="text" id="today-filter-person" placeholder="Person…" aria-label="Person filter" oninput="onTodayFilterChange()">
         <input type="text" id="today-filter-jira" placeholder="Jira key…" aria-label="Jira filter" oninput="onTodayFilterChange()">
       </div>
@@ -1239,6 +1351,15 @@
       </div>
       <div id="task-tag-filter-wrap" class="section-tag-filter-wrap" style="display:none"></div>
       <div id="task-list"></div>
+    </div>
+
+    <!-- LOGBOOK (completed tasks) -->
+    <div id="panel-logbook" class="panel tasks-panel-figma">
+      <div class="tasks-page-head">
+        <h1 class="tasks-page-title">Logbook</h1>
+      </div>
+      <div class="stats-row tasks-stats-figma" id="logbook-stats"></div>
+      <div id="logbook-list"></div>
     </div>
 
     <!-- NOTES -->
@@ -1434,6 +1555,8 @@
 <script>
 /** Legacy key: used when IndexedDB module is unavailable (e.g. file://) or as read fallback. */
 const STORE_KEY = 'planner-v1';
+const LOCAL_APP_ORIGIN = 'http://127.0.0.1:3847';
+const API_BASE = location.protocol === 'file:' ? LOCAL_APP_ORIGIN : '';
 const TASK_DASHBOARD_KEY = 'planner-task-dashboard';
 const GOAL_DASHBOARD_KEY = 'planner-goal-dashboard';
 const JOURNAL_DASHBOARD_KEY = 'planner-journal-dashboard';
@@ -1603,6 +1726,41 @@ function snapshotTaskComposerDraft() {
   if (td) composerDraftDesc = td.value;
 }
 const cardExpandTimers = {};
+const CARD_MOTION_SEL = '.task-item-figma, .goal-item-figma, .journal-item-figma, .task-step-item, .goal-step-item';
+const CARD_MOTION_MS = 280;
+
+function prefersReducedMotion() {
+  return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/** Animate card expand/collapse across a DOM update (VT when available, else height FLIP). */
+function withCardMotion(updateCb) {
+  if (prefersReducedMotion()) {
+    updateCb();
+    return;
+  }
+  if (typeof document.startViewTransition === 'function') {
+    document.startViewTransition(() => { updateCb(); });
+    return;
+  }
+  const first = new Map();
+  document.querySelectorAll(CARD_MOTION_SEL).forEach(el => {
+    if (el.id) first.set(el.id, el.getBoundingClientRect().height);
+  });
+  updateCb();
+  requestAnimationFrame(() => {
+    document.querySelectorAll(CARD_MOTION_SEL).forEach(el => {
+      if (!el.id || !first.has(el.id)) return;
+      const from = first.get(el.id);
+      const to = el.getBoundingClientRect().height;
+      if (Math.abs(from - to) < 1) return;
+      el.animate(
+        [{ height: from + 'px', overflow: 'hidden' }, { height: to + 'px', overflow: 'hidden' }],
+        { duration: CARD_MOTION_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+      );
+    });
+  });
+}
 
 function armCardExpandToggle(key, fn) {
   clearTimeout(cardExpandTimers[key]);
@@ -1644,6 +1802,131 @@ function collapseExpandedGoalsExcept(keepId) {
     }
   }
 }
+
+function hasOpenExpandedCard() {
+  for (const id of Object.keys(expandedTasks)) if (expandedTasks[id]) return true;
+  for (const id of Object.keys(expandedGoals)) if (expandedGoals[id]) return true;
+  for (const id of Object.keys(expandedJournal)) if (expandedJournal[id]) return true;
+  return false;
+}
+
+function flushJournalCardFields(id) {
+  const ta = document.getElementById('journal-entry-input-' + id);
+  const entry = data.journal.find(x => x.id === id);
+  if (!entry || !ta) return;
+  const v = ta.value.trim();
+  if (v) entry.text = v;
+}
+
+/** Click-outside: flush open cards and collapse them. Returns which lists need a re-render. */
+function dismissOpenExpandedCards() {
+  let tasks = false;
+  let goals = false;
+  let journal = false;
+  for (const tid of Object.keys(expandedTasks)) {
+    if (!expandedTasks[tid]) continue;
+    flushTaskCardFields(tid);
+    delete taskEditSnapshots[tid];
+    expandedTasks[tid] = false;
+    tasks = true;
+  }
+  if (taskSubtaskComposerFor) {
+    taskSubtaskComposerFor = null;
+    clearNestedComposerDraft();
+    tasks = true;
+  }
+  for (const gid of Object.keys(expandedGoals)) {
+    if (!expandedGoals[gid]) continue;
+    flushGoalCardFields(gid);
+    delete goalEditSnapshots[gid];
+    expandedGoals[gid] = false;
+    goals = true;
+  }
+  if (goalSubComposerFor) {
+    goalSubComposerFor = null;
+    clearGoalNestedComposerDraft();
+    goals = true;
+  }
+  for (const id of Object.keys(expandedJournal)) {
+    if (!expandedJournal[id]) continue;
+    flushJournalCardFields(id);
+    expandedJournal[id] = false;
+    journal = true;
+  }
+  if (!tasks && !goals && !journal) return null;
+  save();
+  return { tasks, goals, journal };
+}
+
+function onDocumentClickDismissCards(e) {
+  if (!e || e.button != null && e.button !== 0) return;
+  if (taskDndSourceId || goalDndSourceId) return;
+  if (!hasOpenExpandedCard()) return;
+  const t = e.target;
+  if (!(t instanceof Element)) return;
+  if (t.closest('.task-drag-handle, .goal-drag-handle, .task-step-drag-handle, .goal-step-drag-handle')) return;
+  // Search hit navigates then this same click bubbles here — don't collapse the card we just opened.
+  if (t.closest('.search-hit')) return;
+  // Keep open when interacting inside the expanded card (or its row chrome / drag handle).
+  const item = t.closest('.task-item-figma, .goal-item-figma, .journal-item-figma');
+  if (item && item.querySelector('.card-expanded.open')) return;
+  // Another list row manages its own expand/collapse.
+  if (item) return;
+  const changed = dismissOpenExpandedCards();
+  if (!changed) return;
+  withCardMotion(() => {
+    if (changed.tasks) refreshTaskLists();
+    if (changed.goals) renderGoals();
+    if (changed.journal) renderJournal();
+  });
+}
+
+document.addEventListener('click', onDocumentClickDismissCards);
+
+/** Word-jump in text fields (⌥←/→). Some Chromium embeds don't apply native caret moves. */
+function isTextCaretField(el) {
+  if (!el || el.disabled || el.readOnly) return false;
+  if (el.tagName === 'TEXTAREA') return true;
+  if (el.tagName !== 'INPUT') return false;
+  const t = (el.type || 'text').toLowerCase();
+  return !t || t === 'text' || t === 'search' || t === 'url' || t === 'email' || t === 'tel' || t === 'password';
+}
+function textFieldWordBoundary(value, pos, dir) {
+  const n = value.length;
+  let i = Math.max(0, Math.min(n, pos));
+  const isWord = (ch) => /[^\s\u00A0]/.test(ch);
+  if (dir < 0) {
+    while (i > 0 && !isWord(value[i - 1])) i--;
+    while (i > 0 && isWord(value[i - 1])) i--;
+  } else {
+    while (i < n && !isWord(value[i])) i++;
+    while (i < n && isWord(value[i])) i++;
+  }
+  return i;
+}
+function onDocumentKeydownWordCaret(e) {
+  if (!e.altKey || e.metaKey || e.ctrlKey) return;
+  const left = e.key === 'ArrowLeft' || e.code === 'ArrowLeft';
+  const right = e.key === 'ArrowRight' || e.code === 'ArrowRight';
+  if (!left && !right) return;
+  const el = e.target;
+  if (!isTextCaretField(el)) return;
+  e.preventDefault();
+  const v = String(el.value || '');
+  const start = el.selectionStart | 0;
+  const end = el.selectionEnd | 0;
+  const dir = left ? -1 : 1;
+  const from = dir < 0 ? start : end;
+  const next = textFieldWordBoundary(v, from, dir);
+  if (e.shiftKey) {
+    if (dir < 0) el.setSelectionRange(next, end);
+    else el.setSelectionRange(start, next);
+  } else {
+    el.setSelectionRange(next, next);
+  }
+}
+document.addEventListener('keydown', onDocumentKeydownWordCaret);
+
 function snapshotGoalNestedDraft() {
   const gid = goalSubComposerFor;
   if (!gid) return;
@@ -1682,7 +1965,7 @@ function onTaskRowClick(id, e) {
         pendingFocusTaskTitleId = id;
       }
       save();
-      refreshTaskLists();
+      withCardMotion(() => refreshTaskLists());
     });
     return;
   }
@@ -1695,7 +1978,7 @@ function onTaskRowClick(id, e) {
     pendingFocusTaskTitleId = id;
   }
   save();
-  refreshTaskLists();
+  withCardMotion(() => refreshTaskLists());
 }
 function onTaskTitleDblClick(id, e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -1706,7 +1989,7 @@ function onTaskTitleDblClick(id, e) {
     captureTaskEditSnapshot(id);
     pendingFocusTaskTitleId = id;
     save();
-    refreshTaskLists();
+    withCardMotion(() => refreshTaskLists());
   }
 }
 function onGoalRowClick(id, e) {
@@ -1727,7 +2010,7 @@ function onGoalRowClick(id, e) {
         pendingFocusGoalTitleId = id;
       }
       save();
-      renderGoals();
+      withCardMotion(() => renderGoals());
     });
     return;
   }
@@ -1740,7 +2023,7 @@ function onGoalRowClick(id, e) {
     pendingFocusGoalTitleId = id;
   }
   save();
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function onGoalTitleDblClick(id, e) {
   if (e) { e.preventDefault(); e.stopPropagation(); }
@@ -1751,7 +2034,7 @@ function onGoalTitleDblClick(id, e) {
     captureGoalEditSnapshot(id);
     pendingFocusGoalTitleId = id;
     save();
-    renderGoals();
+    withCardMotion(() => renderGoals());
   }
 }
 
@@ -1839,6 +2122,7 @@ function isPanelActive(tab) {
 function refreshTaskLists() {
   renderToday();
   renderTasks();
+  renderLogbook();
 }
 
 function updatedAtMs(obj) {
@@ -1849,7 +2133,7 @@ function updatedAtMs(obj) {
 
 async function persistDataToServer() {
   try {
-    const res = await fetch('/api/save', {
+    const res = await fetch(API_BASE + '/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -1881,12 +2165,57 @@ async function persistData() {
 
 async function fetchServerState() {
   try {
-    const res = await fetch('/planner-data.json', { cache: 'no-store' });
+    const res = await fetch(API_BASE + '/planner-data.json', { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch (e) {
     return null;
   }
+}
+
+/** file:// cannot share IndexedDB with localhost — hop onto the server origin when it is up. */
+async function hopToLocalAppFromFile() {
+  if (location.protocol !== 'file:') return false;
+  let server = null;
+  try {
+    const res = await fetch(LOCAL_APP_ORIGIN + '/api/state', { cache: 'no-store' });
+    if (res.ok) server = await res.json();
+  } catch (e) {
+    server = null;
+  }
+  if (!server) {
+    const ban = document.getElementById('file-origin-banner');
+    if (ban) ban.style.display = 'block';
+    return false;
+  }
+  let local = null;
+  try {
+    await getPersistModule();
+    if (persistModuleCache) local = await persistModuleCache.loadState();
+  } catch (e) {
+    /* ignore */
+  }
+  if (!local) {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) local = JSON.parse(raw);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+  if (local && updatedAtMs(local) > updatedAtMs(server)) {
+    try {
+      await fetch(LOCAL_APP_ORIGIN + '/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(local)
+      });
+    } catch (e) {
+      /* still hop — disk already has whatever server had */
+    }
+  }
+  location.replace(LOCAL_APP_ORIGIN + '/' + (location.hash || ''));
+  return true;
 }
 
 async function pullServerStateIfNewer() {
@@ -2583,6 +2912,7 @@ function switchTab(tab, btn, opts) {
   }
   if (tab === 'today') renderToday();
   else if (tab === 'tasks') renderTasks();
+  else if (tab === 'logbook') renderLogbook();
   else if (tab === 'goals') renderGoals();
   else if (tab === 'notes') renderNotes();
   else if (tab === 'journal') renderJournal();
@@ -2614,7 +2944,7 @@ function toggleTaskComposer(preset) {
     composerDraftWhen = '';
     pendingFocusTaskComposer = false;
   }
-  refreshTaskLists();
+  withCardMotion(() => refreshTaskLists());
 }
 function cancelTaskComposer() {
   taskComposerOpen = false;
@@ -2623,7 +2953,7 @@ function cancelTaskComposer() {
   composerDraftPerson = '';
   composerDraftWhen = '';
   pendingFocusTaskComposer = false;
-  refreshTaskLists();
+  withCardMotion(() => refreshTaskLists());
 }
 function applyComposerPreset(preset, rerender) {
   const p = String(preset || 'do').toLowerCase();
@@ -2860,13 +3190,29 @@ function moveTaskToBacklog(id) {
 function scheduleTaskToday(id) {
   scheduleTask(id, todayYmdLocal());
 }
+function syncTodayPriorityChips() {
+  const wrap = document.getElementById('today-prio-chips');
+  if (!wrap) return;
+  const cur = todayFilterPriority || '';
+  wrap.querySelectorAll('.today-prio-chip').forEach((btn) => {
+    const on = (btn.getAttribute('data-p') || '') === cur;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+function setTodayPriorityFilter(p) {
+  const next = p === 'p1' || p === 'p2' || p === 'p3' || p === 'p4' ? p : '';
+  // Second click on the same chip clears filter back to All
+  todayFilterPriority = todayFilterPriority === next ? '' : next;
+  syncTodayPriorityChips();
+  onTodayFilterChange();
+}
 function onTodayFilterChange() {
-  const p = document.getElementById('today-filter-p');
   const person = document.getElementById('today-filter-person');
   const jira = document.getElementById('today-filter-jira');
-  todayFilterPriority = p ? p.value : '';
   todayFilterPerson = person ? person.value.trim().toLowerCase() : '';
   todayFilterJira = jira ? jira.value.trim().toLowerCase() : '';
+  syncTodayPriorityChips();
   renderToday();
 }
 function setTodayMode(mode) {
@@ -2998,6 +3344,12 @@ function isBacklogOpenTask(t, day) {
   if (t.scheduledOn !== day) return true;
   return false;
 }
+function tabForTask(t) {
+  if (!t) return 'tasks';
+  if (t.done) return 'logbook';
+  if (isTodayTask(t, todayYmdLocal())) return 'today';
+  return 'tasks';
+}
 function setTaskCat(id, cat) {
   const t = data.tasks.find(x => x.id === id);
   if (!t) return;
@@ -3054,7 +3406,7 @@ function cancelTaskCardEdit(tid) {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
   save();
-  refreshTaskLists();
+  withCardMotion(() => refreshTaskLists());
 }
 function saveTaskCardEdit(tid) {
   flushTaskCardFields(tid);
@@ -3064,7 +3416,7 @@ function saveTaskCardEdit(tid) {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
   save();
-  refreshTaskLists();
+  withCardMotion(() => refreshTaskLists());
 }
 function autoGrowDescTextarea(el) {
   if (!el || el.tagName !== 'TEXTAREA') return;
@@ -3103,8 +3455,9 @@ function setTaskPriority(tid, p) {
   if (!t) return;
   flushTaskCardFields(tid);
   t.priority = normalizeTaskPriority(p);
+  expandedTasks[tid] = true;
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 function setComposerDraftPriority(p) {
   composerDraftPriority = normalizeTaskPriority(p);
@@ -3112,11 +3465,11 @@ function setComposerDraftPriority(p) {
 }
 function setNestedDraftCat(v) {
   nestedDraftCat = normalizeTaskCat(v);
-  renderTasks();
+  refreshTaskLists();
 }
 function setNestedDraftPriority(p) {
   nestedDraftPriority = normalizeTaskPriority(p);
-  renderTasks();
+  refreshTaskLists();
 }
 function openTaskSubtaskComposer(tid) {
   taskSubtaskComposerFor = tid;
@@ -3126,7 +3479,7 @@ function openTaskSubtaskComposer(tid) {
   nestedStDraftTitle = '';
   nestedStDraftDesc = '';
   pendingFocusNestedSubtaskTid = tid;
-  renderTasks();
+  withCardMotion(() => refreshTaskLists());
 }
 function applyNestedComposerEditState(tid, mid) {
   const t = data.tasks.find(x => x.id === tid);
@@ -3143,7 +3496,7 @@ function applyNestedComposerEditState(tid, mid) {
 function openNestedComposerForMilestone(tid, mid) {
   applyNestedComposerEditState(tid, mid);
   pendingFocusNestedSubtaskTid = tid;
-  renderTasks();
+  withCardMotion(() => refreshTaskLists());
 }
 function onTaskStepRowClick(tid, mid, e) {
   if (!e) return;
@@ -3154,7 +3507,7 @@ function onTaskStepRowClick(tid, mid, e) {
 function cancelNestedSubtaskComposer() {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
-  renderTasks();
+  withCardMotion(() => refreshTaskLists());
 }
 function submitNestedSubtaskFromComposer(tid) {
   const titleEl = document.getElementById('nested-st-title-' + tid);
@@ -3190,7 +3543,7 @@ function submitNestedSubtaskFromComposer(tid) {
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
   save();
-  renderTasks();
+  withCardMotion(() => refreshTaskLists());
 }
 function syncNestedAddBtn(tid) {
   const inp = document.getElementById('nested-st-title-' + tid);
@@ -3293,7 +3646,7 @@ function taskStepRowHTML(t, m) {
   </div>
   </div>`;
   const expanded = editingThis ? `<div class="task-step-nested-expanded open">${taskNestedSubtaskComposerHTML(t.id)}</div>` : '';
-  return `<div class="task-step-item" id="planner-tms-${t.id}-${m.id}" data-ms-scope="task" data-ms-parent="${t.id}"
+  return `<div class="task-step-item" id="planner-tms-${t.id}-${m.id}" style="view-transition-name: vt-tms-${t.id}-${m.id}" data-ms-scope="task" data-ms-parent="${t.id}"
     ondragover="milestoneDragOver(event,'task','${t.id}','${m.id}')" ondragleave="milestoneDragLeave(event)" ondrop="milestoneDrop(event,'task','${t.id}','${m.id}')">${row}${expanded}</div>`;
 }
 
@@ -3392,7 +3745,7 @@ function goalStepRowHTML(g, m) {
   </div>
   </div>`;
   const expanded = editingThis ? `<div class="goal-step-nested-expanded open">${goalNestedSubgoalComposerHTML(g.id)}</div>` : '';
-  return `<div class="goal-step-item" id="planner-gms-${g.id}-${m.id}" data-ms-scope="goal" data-ms-parent="${g.id}"
+  return `<div class="goal-step-item" id="planner-gms-${g.id}-${m.id}" style="view-transition-name: vt-gms-${g.id}-${m.id}" data-ms-scope="goal" data-ms-parent="${g.id}"
     ondragover="milestoneDragOver(event,'goal','${g.id}','${m.id}')" ondragleave="milestoneDragLeave(event)" ondrop="milestoneDrop(event,'goal','${g.id}','${m.id}')">${row}${expanded}</div>`;
 }
 function goalExpandedBodyHTML(g) {
@@ -3446,7 +3799,7 @@ function goalItemHTML(g) {
   const exp = !!expandedGoals[g.id];
   const doneLbl = g.done ? 'Mark as not done' : 'Mark complete';
   const sec = g.done ? 'done' : 'open';
-  return `<div class="goal-item-figma" id="planner-goal-${g.id}" data-goal-section="${sec}"
+  return `<div class="goal-item-figma" id="planner-goal-${g.id}" style="view-transition-name: vt-goal-${g.id}" data-goal-section="${sec}"
     ondragover="goalDragOver(event)" ondragleave="goalDragLeave(event)" ondrop="goalDrop(event,'${g.id}')">
     <span class="goal-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder" title="Drag to reorder"
       ondragstart="goalDragStart(event,'${g.id}')" ondragend="goalDragEnd(event)" onclick="event.stopPropagation()">${taskDragHandleSVG()}</span>
@@ -3619,7 +3972,6 @@ function taskTodayMetaLine(t) {
   if (t.kind === 'promise' && t.deadline) bits.push('due ' + t.deadline);
   if (t.kind === 'wait' && t.waitingOn) bits.push('waiting on ' + t.waitingOn);
   if (t.kind === 'wait' && t.nextCheckAt) bits.push('check ' + t.nextCheckAt);
-  if (t.jiraKey) bits.push(t.jiraKey);
   if (!bits.length) return '';
   return `<div class="today-meta-line">${esc(bits.join(' · '))}</div>`;
 }
@@ -4013,7 +4365,7 @@ function renameTagFromInput(id, raw) {
   ensureTagsArray();
   const tag = data.tags.find(x => x.id === id);
   if (!tag) return;
-  if (!name) {
+  if (!name || name === tag.name) {
     renderTagsPanel();
     return;
   }
@@ -4034,39 +4386,94 @@ function deleteTagById(id) {
   renderAll();
 }
 
-function moveTag(id, delta) {
-  sortTagsInPlace();
-  const i = data.tags.findIndex(t => t.id === id);
-  if (i < 0) return;
-  const j = i + delta;
-  if (j < 0 || j >= data.tags.length) return;
-  const a = data.tags[i].order ?? i;
-  const b = data.tags[j].order ?? j;
-  data.tags[i].order = b;
-  data.tags[j].order = a;
-  sortTagsInPlace();
-  data.tags.forEach((t, idx) => { t.order = idx; });
+let tagDndSourceId = null;
+function tagDragStart(ev, id) {
+  tagDndSourceId = id;
+  ev.dataTransfer.effectAllowed = 'move';
+  ev.dataTransfer.setData('text/plain', 'tag:' + id);
+  const row = document.getElementById('planner-tag-' + id);
+  if (row) row.classList.add('tag-item-dragging');
+  ev.stopPropagation();
+}
+function tagDragEnd() {
+  document.querySelectorAll('.tag-manager-row.tag-item-dragging').forEach(el => el.classList.remove('tag-item-dragging'));
+  document.querySelectorAll('.tag-manager-row.tag-drop-before, .tag-manager-row.tag-drop-after').forEach(el => {
+    el.classList.remove('tag-drop-before', 'tag-drop-after');
+  });
+  tagDndSourceId = null;
+}
+function tagDragOver(ev) {
+  ev.preventDefault();
+  if (!tagDndSourceId) return;
+  ev.dataTransfer.dropEffect = 'move';
+  const el = ev.currentTarget;
+  document.querySelectorAll('.tag-manager-row').forEach(x => {
+    if (x !== el) x.classList.remove('tag-drop-before', 'tag-drop-after');
+  });
+  const rect = el.getBoundingClientRect();
+  const before = ev.clientY < rect.top + rect.height / 2;
+  el.classList.toggle('tag-drop-before', before);
+  el.classList.toggle('tag-drop-after', !before);
+}
+function tagDragLeave(ev) {
+  const el = ev.currentTarget;
+  const rel = ev.relatedTarget;
+  if (rel && el.contains(rel)) return;
+  el.classList.remove('tag-drop-before', 'tag-drop-after');
+}
+function tagDrop(ev, id) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const el = ev.currentTarget;
+  el.classList.remove('tag-drop-before', 'tag-drop-after');
+  const dt = ev.dataTransfer.getData('text/plain') || '';
+  const movedId = tagDndSourceId || dt.replace(/^tag:/, '');
+  if (!movedId || movedId === id) {
+    tagDragEnd();
+    return;
+  }
+  const rect = el.getBoundingClientRect();
+  const placeBefore = ev.clientY < rect.top + rect.height / 2;
+  reorderTagRelativeTo(movedId, id, placeBefore);
+  tagDndSourceId = null;
   save();
   renderTagsPanel();
   renderAll();
 }
-
+function reorderTagRelativeTo(movedId, overId, placeBefore) {
+  if (movedId === overId) return;
+  sortTagsInPlace();
+  const ids = data.tags.map(t => t.id);
+  const from = ids.indexOf(movedId);
+  if (from < 0 || ids.indexOf(overId) < 0) return;
+  ids.splice(from, 1);
+  let insertAt = ids.indexOf(overId);
+  if (insertAt < 0) return;
+  if (!placeBefore) insertAt += 1;
+  ids.splice(insertAt, 0, movedId);
+  const byId = new Map(data.tags.map(t => [t.id, t]));
+  data.tags = ids.map(i => byId.get(i)).filter(Boolean);
+  data.tags.forEach((t, idx) => { t.order = idx; });
+}
 function renderTagsPanel() {
   const el = document.getElementById('tag-manager-list');
   if (!el) return;
   sortTagsInPlace();
   const tags = data.tags;
   if (!tags.length) {
-    el.innerHTML = '<div class="empty">No tags yet. Add a name above and click Add tag.</div>';
+    el.innerHTML = '<div class="task-list-empty-hint">No tags yet. Add a name above and click Add tag.</div>';
     return;
   }
-  el.innerHTML = tags.map((tag, idx) => `
-    <div class="tag-manager-row card" data-tag-id="${tag.id}">
-      <input type="text" class="tag-rename-input" value="${esc(tag.name)}" aria-label="Tag name" onchange="renameTagFromInput('${tag.id}', this.value)" onblur="renameTagFromInput('${tag.id}', this.value)">
-      <div class="tag-manager-row-actions">
-        <button type="button" class="btn btn-sm btn--outline" ${idx === 0 ? 'disabled' : ''} onclick="moveTag('${tag.id}', -1)" aria-label="Move up">↑</button>
-        <button type="button" class="btn btn-sm btn--outline" ${idx === tags.length - 1 ? 'disabled' : ''} onclick="moveTag('${tag.id}', 1)" aria-label="Move down">↓</button>
-        <button type="button" class="btn btn-sm btn--ghost" onclick="deleteTagById('${tag.id}')">Delete</button>
+  el.innerHTML = tags.map(tag => `
+    <div class="tag-manager-row" id="planner-tag-${tag.id}" data-tag-id="${tag.id}"
+      ondragover="tagDragOver(event)" ondragleave="tagDragLeave(event)" ondrop="tagDrop(event,'${tag.id}')">
+      <span class="task-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder" title="Drag to reorder"
+        ondragstart="tagDragStart(event,'${tag.id}')" ondragend="tagDragEnd(event)" onclick="event.stopPropagation()">${taskDragHandleSVG()}</span>
+      <div class="tag-manager-row-figma">
+        <input type="text" class="tag-rename-input" value="${esc(tag.name)}" maxlength="80" aria-label="Tag name"
+          onchange="renameTagFromInput('${tag.id}', this.value)" onblur="renameTagFromInput('${tag.id}', this.value)"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+        <button type="button" class="task-edit-trash-btn" onclick="event.stopPropagation();deleteTagById('${tag.id}')" aria-label="Delete tag">${trashBtnIcon()}</button>
       </div>
     </div>
   `).join('');
@@ -4386,7 +4793,7 @@ function taskDrop(ev, id) {
   reorderTaskRelativeTo(movedId, id, placeBefore);
   taskDndSourceId = null;
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 
 function reorderTaskRelativeTo(movedId, overId, placeBefore) {
@@ -4659,7 +5066,7 @@ function taskItemHTML(t) {
   const exp = !!expandedTasks[t.id];
   const doneLbl = t.done ? 'Mark as not done' : 'Mark complete';
   const sec = t.done ? 'done' : 'open';
-  return `<div class="task-item-figma" id="planner-task-${t.id}" data-task-section="${sec}"
+  return `<div class="task-item-figma" id="planner-task-${t.id}" style="view-transition-name: vt-task-${t.id}" data-task-section="${sec}"
     ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,'${t.id}')">
     <span class="task-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder" title="Drag to reorder"
       ondragstart="taskDragStart(event,'${t.id}')" ondragend="taskDragEnd(event)" onclick="event.stopPropagation()">${taskDragHandleSVG()}</span>
@@ -4674,7 +5081,6 @@ function taskItemHTML(t) {
           </div>
         </div>
         ${taskTodayMetaLine(t)}
-        ${taskRowTagsLineHTML(t)}
       </div>
     </div>
     <div class="card-expanded task-expanded-under new-task-card task-expanded-card ${exp ? 'open' : ''}">
@@ -4873,9 +5279,9 @@ function renderToday() {
           <div class="triage-title">${esc(t.text)} ${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}${(t.rolloverCount || 0) ? `<span class="today-meta-line">rollovers ${t.rolloverCount}</span>` : ''}</div>
           <div class="today-triage-actions">
             <input type="date" id="eve-date-${t.id}" value="${esc(nextMon)}" aria-label="Reschedule date">
-            <button type="button" class="btn btn--outline btn--dense" onclick="eveningReschedule('${t.id}', document.getElementById('eve-date-${t.id}').value)">Reschedule</button>
-            <button type="button" class="btn btn--outline btn--dense" onclick="eveningBacklog('${t.id}')">Backlog</button>
-            <button type="button" class="btn btn--primary btn--dense" onclick="eveningComplete('${t.id}')">Complete</button>
+            <button type="button" class="btn btn-sm btn--soft" onclick="eveningReschedule('${t.id}', document.getElementById('eve-date-${t.id}').value)">Reschedule</button>
+            <button type="button" class="btn btn-sm btn--soft" onclick="eveningBacklog('${t.id}')">Backlog</button>
+            <button type="button" class="btn btn-sm btn--primary" onclick="eveningComplete('${t.id}')">Complete</button>
           </div>
         </div>`);
       }
@@ -4953,7 +5359,7 @@ function renderToday() {
   section('Promise', promises, 'today-section-promise');
   section('Wait', waits, 'today-section-wait');
   parts.push('<div class="task-section-head" style="margin-top:20px">Not on Today</div>');
-  parts.push('<div class="task-list-empty-hint"><button type="button" class="btn btn--outline btn--dense" onclick="switchTab(\'tasks\')">Open backlog (Tasks)</button></div>');
+  parts.push('<div class="task-list-empty-hint"><button type="button" class="btn btn-sm btn--ghost" onclick="switchTab(\'tasks\')">Open backlog (Tasks)</button></div>');
   if (isPanelActive('today')) {
     parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer(\'do\')"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add to Today</button>');
     parts.push(taskComposerHTML());
@@ -5012,7 +5418,7 @@ function renderTasks() {
   const total = open.length + done.length;
   statsEl.innerHTML = `
     <div class="stat"><div class="stat-num">${open.length}</div><div class="stat-lbl">Backlog</div></div>
-    <div class="stat"><div class="stat-num">${done.length}</div><div class="stat-lbl">Done</div></div>
+    <div class="stat" role="button" tabindex="0" style="cursor:pointer" title="Open Logbook" onclick="switchTab('logbook')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchTab('logbook')}"><div class="stat-num">${done.length}</div><div class="stat-lbl">Done</div></div>
     <div class="stat"><div class="stat-num">${total ? Math.round(done.length/total*100) : 0}%</div><div class="stat-lbl">Complete</div></div>`;
   const parts = [];
   parts.push('<div class="task-section-head">Backlog</div>');
@@ -5024,16 +5430,15 @@ function renderTasks() {
     parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer()"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add Task</button>');
     parts.push(taskComposerHTML());
   }
-  if (done.length) {
-    parts.push('<div class="task-section-head task-section-complete">Complete</div>');
-    parts.push(done.map(taskItemHTML).join(''));
-  }
   el.innerHTML = parts.join('');
-  const focusTaskTitleId = pendingFocusTaskTitleId;
-  const focusNestedSubtaskTid = pendingFocusNestedSubtaskTid;
-  pendingFocusTaskTitleId = null;
-  pendingFocusNestedSubtaskTid = null;
-  if (taskComposerOpen && isPanelActive('tasks')) {
+  const onTasks = isPanelActive('tasks');
+  const focusTaskTitleId = onTasks ? pendingFocusTaskTitleId : null;
+  const focusNestedSubtaskTid = onTasks ? pendingFocusNestedSubtaskTid : null;
+  if (onTasks) {
+    pendingFocusTaskTitleId = null;
+    pendingFocusNestedSubtaskTid = null;
+  }
+  if (taskComposerOpen && onTasks) {
     requestAnimationFrame(() => {
       syncComposerAddBtn();
       const focusComposerTitle = pendingFocusTaskComposer;
@@ -5065,6 +5470,62 @@ function renderTasks() {
       if (inp) inp.focus();
     }
     data.tasks.forEach(t => {
+      if (expandedTasks[t.id] && !t.done) {
+        updateTaskDescPreview(t.id);
+        const tinp = document.getElementById('task-title-inp-' + t.id);
+        if (tinp && tinp.classList && tinp.classList.contains('task-main-title-field')) autoGrowDescTextarea(tinp);
+      }
+      if (taskSubtaskComposerFor === t.id && !t.done) {
+        syncNestedAddBtn(t.id);
+        const nta = document.getElementById('nested-st-desc-' + t.id);
+        const nprev = document.getElementById('nested-st-desc-preview-' + t.id);
+        const nshell = document.getElementById('nested-desc-shell-' + t.id);
+        updateRichDescPreviewEl(nta, nprev, nshell);
+      }
+    });
+  });
+}
+
+function completedAtMs(t) {
+  if (!t) return 0;
+  if (typeof t.completedAt === 'string' && t.completedAt) {
+    const n = Date.parse(t.completedAt);
+    if (Number.isFinite(n)) return n;
+  }
+  return typeof t.ts === 'number' ? t.ts : 0;
+}
+
+function renderLogbook() {
+  const statsEl = document.getElementById('logbook-stats');
+  const el = document.getElementById('logbook-list');
+  if (!statsEl || !el) return;
+  const done = data.tasks.filter(t => t.done).slice().sort((a, b) => completedAtMs(b) - completedAtMs(a));
+  statsEl.innerHTML = `
+    <div class="stat"><div class="stat-num">${done.length}</div><div class="stat-lbl">Completed</div></div>`;
+  const onLogbook = isPanelActive('logbook');
+  const focusTaskTitleId = onLogbook ? pendingFocusTaskTitleId : null;
+  const focusNestedSubtaskTid = onLogbook ? pendingFocusNestedSubtaskTid : null;
+  if (onLogbook) {
+    pendingFocusTaskTitleId = null;
+    pendingFocusNestedSubtaskTid = null;
+  }
+  if (!done.length) {
+    el.innerHTML = '<div class="task-list-empty-hint">No completed tasks yet.</div>';
+    return;
+  }
+  el.innerHTML = done.map(taskItemHTML).join('');
+  requestAnimationFrame(() => {
+    if (focusTaskTitleId) {
+      const inp = document.getElementById('task-title-inp-' + focusTaskTitleId);
+      if (inp) {
+        inp.focus();
+        if (inp.classList && inp.classList.contains('task-main-title-field')) autoGrowDescTextarea(inp);
+      }
+    } else if (focusNestedSubtaskTid) {
+      const inp = document.getElementById('nested-st-title-' + focusNestedSubtaskTid);
+      if (inp) inp.focus();
+    }
+    done.forEach(t => {
       if (expandedTasks[t.id]) {
         updateTaskDescPreview(t.id);
         const tinp = document.getElementById('task-title-inp-' + t.id);
@@ -5181,7 +5642,7 @@ function toggleGoalComposer() {
     composerGoalDraftTitle = '';
     composerGoalDraftDesc = '';
   }
-  renderGoals();
+  withCardMotion(() => renderGoals());
   if (goalComposerOpen) {
     requestAnimationFrame(() => {
       const el = document.getElementById('composer-goal-title');
@@ -5194,7 +5655,7 @@ function cancelGoalComposer() {
   goalComposerOpen = false;
   composerGoalDraftTitle = '';
   composerGoalDraftDesc = '';
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function setComposerGoalDraftCat(v) {
   composerGoalDraftCat = normalizeGoalCat(v);
@@ -5376,7 +5837,7 @@ function cancelGoalCardEdit(gid) {
   nestedGoalComposerEditMid = null;
   clearGoalNestedComposerDraft();
   save();
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function saveGoalCardEdit(gid) {
   flushGoalCardFields(gid);
@@ -5387,7 +5848,7 @@ function saveGoalCardEdit(gid) {
   nestedGoalComposerEditMid = null;
   clearGoalNestedComposerDraft();
   save();
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function setGoalPriority(gid, p) {
   const g = data.goals.find(x => x.id === gid);
@@ -5413,7 +5874,7 @@ function openGoalSubComposer(gid) {
   nestedGoalStDraftTitle = '';
   nestedGoalStDraftDesc = '';
   pendingFocusNestedSubgoalGid = gid;
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function applyNestedGoalComposerEditState(gid, mid) {
   const g = data.goals.find(x => x.id === gid);
@@ -5430,7 +5891,7 @@ function applyNestedGoalComposerEditState(gid, mid) {
 function openNestedComposerForGoalMilestone(gid, mid) {
   applyNestedGoalComposerEditState(gid, mid);
   pendingFocusNestedSubgoalGid = gid;
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function onGoalStepRowClick(gid, mid, e) {
   if (!e) return;
@@ -5441,7 +5902,7 @@ function onGoalStepRowClick(gid, mid, e) {
 function cancelGoalNestedComposer() {
   goalSubComposerFor = null;
   clearGoalNestedComposerDraft();
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function submitNestedSubgoalFromComposer(gid) {
   const titleEl = document.getElementById('nested-sg-title-' + gid);
@@ -5477,7 +5938,7 @@ function submitNestedSubgoalFromComposer(gid) {
   goalSubComposerFor = null;
   clearGoalNestedComposerDraft();
   save();
-  renderGoals();
+  withCardMotion(() => renderGoals());
 }
 function syncGoalNestedAddBtn(gid) {
   const inp = document.getElementById('nested-sg-title-' + gid);
@@ -5631,7 +6092,7 @@ function journalComposerHTML() {
 function toggleJournalComposer() {
   journalComposerOpen = !journalComposerOpen;
   if (journalComposerOpen) composerJournalDraft = '';
-  renderJournal();
+  withCardMotion(() => renderJournal());
   if (journalComposerOpen) {
     requestAnimationFrame(() => {
       const ta = document.getElementById('composer-journal-input');
@@ -5643,7 +6104,7 @@ function toggleJournalComposer() {
 function cancelJournalComposer() {
   journalComposerOpen = false;
   composerJournalDraft = '';
-  renderJournal();
+  withCardMotion(() => renderJournal());
 }
 function onComposerJournalFocus() {
   const shell = document.getElementById('composer-journal-shell');
@@ -5777,7 +6238,7 @@ function saveJournalEntryEdit(id, collapseAfter) {
   const v = ta ? ta.value.trim() : '';
   if (!v) {
     if (collapseAfter) expandedJournal[id] = false;
-    renderJournal();
+    withCardMotion(() => renderJournal());
     return;
   }
   if (v !== entry.text) {
@@ -5785,7 +6246,7 @@ function saveJournalEntryEdit(id, collapseAfter) {
     save();
   }
   if (collapseAfter) expandedJournal[id] = false;
-  renderJournal();
+  withCardMotion(() => renderJournal());
 }
 function onJournalRowClick(id, e) {
   if (!e) return;
@@ -5800,7 +6261,7 @@ function onJournalRowClick(id, e) {
       const wasExpanded = !!expandedJournal[id];
       expandedJournal[id] = !expandedJournal[id];
       if (expandedJournal[id] && !wasExpanded) pendingFocusJournalEntryId = id;
-      renderJournal();
+      withCardMotion(() => renderJournal());
     });
     return;
   }
@@ -5808,13 +6269,13 @@ function onJournalRowClick(id, e) {
   const wasExpanded = !!expandedJournal[id];
   expandedJournal[id] = !expandedJournal[id];
   if (expandedJournal[id] && !wasExpanded) pendingFocusJournalEntryId = id;
-  renderJournal();
+  withCardMotion(() => renderJournal());
 }
 function journalEntryHTML(e) {
   const exp = !!expandedJournal[e.id];
   const snippet = journalSnippetLine(e.text);
   const tagPills = journalSummaryTagPills(e);
-  return `<div class="journal-item-figma" id="planner-journal-${e.id}">
+  return `<div class="journal-item-figma" id="planner-journal-${e.id}" style="view-transition-name: vt-journal-${e.id}">
     <div class="journal-item-figma-body">
       <div class="journal-row-figma ${exp ? 'is-expanded' : ''}" onclick="onJournalRowClick('${e.id}',event)">
         <div class="journal-row-main">
@@ -6199,14 +6660,32 @@ function openSearchHit(i) {
   const r = h.ref;
 
   if (r.t === 'task') {
+    const t = data.tasks.find(x => x.id === r.id);
+    if (!t) return;
     if (r.tab) openTaskTabs[r.id] = r.tab;
     collapseExpandedTasksExcept(r.id);
     if (r.mid) applyNestedComposerEditState(r.id, r.mid);
     expandedTasks[r.id] = true;
-    switchTab('tasks');
+    captureTaskEditSnapshot(r.id);
     if (r.mid) pendingFocusNestedSubtaskTid = r.id;
     else pendingFocusTaskTitleId = r.id;
-    renderTasks();
+    const tab = tabForTask(t);
+    if (tab === 'today') {
+      if (todayMode !== 'day') setTodayMode('day');
+      if (!taskMatchesTodayFilters(t)) {
+        todayFilterPriority = '';
+        todayFilterPerson = '';
+        todayFilterJira = '';
+        const personEl = document.getElementById('today-filter-person');
+        const jiraEl = document.getElementById('today-filter-jira');
+        if (personEl) personEl.value = '';
+        if (jiraEl) jiraEl.value = '';
+        syncTodayPriorityChips();
+      }
+    } else if (tab === 'tasks' && !taskMatchesActiveTagFilters(t)) {
+      taskTagFilterIds = [];
+    }
+    switchTab(tab);
     const elId = r.mid ? 'planner-tms-' + r.id + '-' + r.mid : 'planner-task-' + r.id;
     scrollAndFlash(elId);
     return;
@@ -6380,6 +6859,7 @@ function renderAll() {
   ensureDataShape();
   renderToday();
   renderTasks();
+  renderLogbook();
   renderNotes();
   renderGoals();
   renderJournal();
@@ -6389,7 +6869,10 @@ loadTheme();
 applyTaskDashboardVisibility();
 applyGoalDashboardVisibility();
 applyJournalDashboardVisibility();
-load().catch(function (err) {
+hopToLocalAppFromFile().then(function (hopped) {
+  if (hopped) return;
+  return load();
+}).catch(function (err) {
   console.error('Planner load (unhandled):', err);
   ensureDataShape();
   renderAll();

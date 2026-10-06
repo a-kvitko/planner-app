@@ -281,15 +281,15 @@ Vault `!!! My Notes/!!! Work`: skill `planner-triage` на `GET /api/day` + `POS
 
 ## Acceptance (можно выключать Things)
 
-- [ ] Today: Do / Promise / Wait раздельно; cap 3–5 виден  
-- [ ] Wait не в Do-минутах; transition Wait → default p3  
-- [ ] Schedule не ставит Sat/Sun  
-- [ ] Evening clear разгребает leftovers  
-- [ ] `/api/day` + `/api/patch`; `planner-data.json` актуален  
-- [ ] Агент triage без AppleScript  
-- [ ] Импорт Things; work не только в Things  
-- [ ] Goals / milestones / journal не сломаны  
-- [ ] `/js/planner-db.js` отдаётся; IDB + file sync работают  
+- [x] Today: Do / Promise / Wait раздельно; cap 3–5 виден  
+- [x] Wait не в Do-минутах; transition Wait → default p3  
+- [x] Schedule не ставит Sat/Sun  
+- [x] Evening clear разгребает leftovers  
+- [x] `/api/day` + `/api/patch`; `planner-data.json` актуален  
+- [x] Агент triage без AppleScript  
+- [x] Импорт Things; work не только в Things (cutover dump 2026-10-05)  
+- [x] Goals / milestones / journal не сломаны  
+- [x] `/js/planner-db.js` отдаётся; IDB + file sync работают  
 
 ---
 

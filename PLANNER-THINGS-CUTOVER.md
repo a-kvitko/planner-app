@@ -275,11 +275,11 @@ Idempotent where possible (ops with client `opId`). Schema version check. Never 
 
 | Phase | Status |
 |-------|--------|
-| 1 Schema + file sync | pending |
-| 2 Today UI | pending |
-| 3 Capacity | pending |
-| 4 Agent API | pending |
-| 5 Morning/Evening | pending |
-| 6 Things import | pending |
-| 7 Skill cutover (vault) | pending |
-| 8 Polish + drop Things | pending |
+| 1 Schema + file sync | **done** |
+| 2 Today UI | **done** |
+| 3 Capacity | **done** |
+| 4 Agent API | **done** |
+| 5 Morning/Evening | **done** |
+| 6 Things import | **done** (dump+merge 2026-10-05) |
+| 7 Skill cutover (vault) | **done** (2026-10-05) |
+| 8 Polish + drop Things | deferred |

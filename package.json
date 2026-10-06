@@ -7,7 +7,9 @@
     "check:phase0": "node scripts/phase0-check.mjs",
     "check:phase-a": "node scripts/phase-a-check.mjs",
     "check:capacity": "node --input-type=module -e \"import('./js/capacity.js').then(m=>m._selfCheck())\"",
-    "check:api-ops": "node --input-type=module -e \"import('./js/api-ops.js').then(m=>m._selfCheck())\""
+    "check:api-ops": "node --input-type=module -e \"import('./js/api-ops.js').then(m=>m._selfCheck())\"",
+    "export:things-work": "bash scripts/export-things-work.sh",
+    "import:things": "node scripts/import-things-json.mjs"
   },
   "dependencies": {
     "dexie": "^4.0.10"
