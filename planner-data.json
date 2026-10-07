@@ -2,12 +2,18 @@
   "tasks": [
     {
       "id": "muv1pxlgdcfo",
-      "text": "P3 DR Orlova [TDWEB-18342] Client Area - client account is shown for Watchlist",
-      "description": "2026-10-06 — 2026-10-06 — Today P1. Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash",
+      "text": "P3 👀 DR Orlova [TDWEB-18342] Client Area - client account is shown for Watchlist",
+      "description": "2026-10-06 — 2026-10-06 — Today P1. Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash\n\n07.10.2026: No, we cannot remove the second line of the widget header because this is a common layout for all dxTrade headers.\nI see two possible solutions:\n- Simple one — just remove “Account” from the WH.\n- Alternative — replace “Account” with the \"Admin\" name.\nNow: I'm waiting for Orlova's decition",
       "cat": "work",
-      "priority": "p1",
+      "priority": "p3",
       "tagIds": [
-        "mnyawsv6pszp"
+        "mnyawsv6pszp",
+        "mnrzzd57bino",
+        "mns00n4rgrjt",
+        "mnyaxsgr89pj",
+        "mnyawq89hy4y",
+        "mnyawmpwt18t",
+        "mns006zuavff"
       ],
       "done": false,
       "milestones": [],
@@ -15,8 +21,8 @@
       "links": [],
       "progress": 0,
       "ts": 1791192421204,
-      "kind": "promise",
-      "scheduledOn": "2026-10-06",
+      "kind": "wait",
+      "scheduledOn": "2026-10-07",
       "waitingOn": null,
       "promisedTo": "Orlova",
       "nextCheckAt": null,
@@ -30,10 +36,14 @@
     {
       "id": "muwg5z2ba9vu",
       "text": "Kasperovich — Live mode vs global actions UX",
-      "description": "2026-10-06 — 2026-10-06 — Today. Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).",
+      "description": "2026-10-06 — 2026-10-06 — Today. Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).\n\n06.10.2026: I suggested a solution in the ticket. Waiting for the BAs reply",
       "cat": "work",
-      "priority": "p1",
-      "tagIds": [],
+      "priority": "p3",
+      "tagIds": [
+        "mnyawsv6pszp",
+        "mns006zuavff",
+        "mnrzzz5deeaw"
+      ],
       "done": false,
       "milestones": [],
       "comments": [],
@@ -41,7 +51,7 @@
       "progress": 0,
       "ts": 1791277150403,
       "kind": "promise",
-      "scheduledOn": "2026-10-06",
+      "scheduledOn": "2026-10-07",
       "deadline": null,
       "waitingOn": null,
       "promisedTo": "Kasperovich",
@@ -407,11 +417,14 @@
     {
       "id": "muuza60bqv7y",
       "text": "P3 DR Tatiana Chibireva [TDWEB-18172] Risk Profile - Planned position misaligned in Positions table",
-      "description": "https://jira.in.devexperts.com/browse/TDWEB-18172",
+      "description": "2026-10-06 — 2026-10-06 — clarification done in Jira + RN design updated (node 4247-215543). DR left Confirmed with Tanya for impl. RO port → TDWEB-18389.\nhttps://jira.in.devexperts.com/browse/TDWEB-18172\n\n07.10.2026: I double-checked the current implementation, and decided to unify the left and right paddings within these tables, especially in the Position subsection. \nThe updated design: https://www.figma.com/design/aRqxryisyE3ZoXuQmYCTL3/TD-AT-%25F0%259F%258C%2590-RN?node-id=4247-215543&t=maX62VonMrWF4Jpp-11\nSent the ticket back to Tatyana. Will see how it goes.",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
-        "mnyawsv6pszp"
+        "mnyawsv6pszp",
+        "mnrzzd57bino",
+        "mns006zuavff",
+        "mns00n4rgrjt"
       ],
       "done": false,
       "milestones": [],
@@ -419,7 +432,7 @@
       "links": [],
       "progress": 0,
       "ts": 1791188326379,
-      "kind": "do",
+      "kind": "wait",
       "scheduledOn": "2026-10-05",
       "waitingOn": null,
       "promisedTo": null,
@@ -434,13 +447,13 @@
     {
       "id": "muv7vjb5e8fg",
       "text": "Nastya Pavlyk — discuss the Code connect approach she is working on",
-      "description": "",
+      "description": "Discussed. She demonstrated their approach. Not many things have been done. She said it is better to work on this task together with a developer.\n#code-connect ",
       "cat": "personal",
       "priority": "p3",
       "tagIds": [
         "mnyawsv6pszp"
       ],
-      "done": false,
+      "done": true,
       "milestones": [],
       "comments": [],
       "links": [],
@@ -453,7 +466,7 @@
       "nextCheckAt": null,
       "deadline": null,
       "timeEstimateMin": null,
-      "completedAt": null,
+      "completedAt": "2026-10-07T11:53:23.295Z",
       "rolloverCount": 0,
       "project": null,
       "jiraKey": null
@@ -1619,7 +1632,11 @@
       "description": "",
       "cat": "work",
       "priority": "p3",
-      "tagIds": [],
+      "tagIds": [
+        "mnrzzd57bino",
+        "mnyawq89hy4y",
+        "mns006zuavff"
+      ],
       "done": false,
       "milestones": [],
       "comments": [],
@@ -1627,7 +1644,7 @@
       "progress": 0,
       "ts": 1791289310440,
       "kind": "do",
-      "scheduledOn": "2026-10-06",
+      "scheduledOn": "2026-10-07",
       "waitingOn": null,
       "promisedTo": null,
       "nextCheckAt": null,
@@ -1637,6 +1654,31 @@
       "rolloverCount": 0,
       "project": null,
       "jiraKey": null
+    },
+    {
+      "id": "muwvajxyvy2q",
+      "text": "Port Risk Profile Planned Position alignment design RN → RO [TDWEB-18389]",
+      "description": "2026-10-07 — 2026-10-07 — blocked: wait for devs to confirm unified-paddings approach on TDWEB-18172, then port RN→RO. Do not start yet.",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791302558326,
+      "kind": "park",
+      "scheduledOn": null,
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": 45,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": "work",
+      "jiraKey": "TDWEB-18389"
     }
   ],
   "notes": [],
@@ -1778,5 +1820,5 @@
     "dayOverrides": {}
   },
   "schemaVersion": 2,
-  "updatedAt": "2026-10-06T14:50:12.032Z"
+  "updatedAt": "2026-10-07T13:43:42.596Z"
 }

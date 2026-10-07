@@ -736,6 +736,21 @@
   .task-desc-preview:empty { display: none; }
   a.task-desc-link { color: var(--blue); text-decoration: underline; cursor: pointer; }
   a.task-desc-link:hover { color: #1d4ed8; }
+  .task-desc-preview ul.task-desc-list,
+  .task-desc-preview ol.task-desc-list,
+  .note-body-text ul.task-desc-list,
+  .note-body-text ol.task-desc-list,
+  .comment-text ul.task-desc-list,
+  .comment-text ol.task-desc-list,
+  .journal-entry-text ul.task-desc-list,
+  .journal-entry-text ol.task-desc-list {
+    margin: 0.2em 0;
+    padding-left: 1.35em;
+  }
+  .task-desc-preview li,
+  .note-body-text li,
+  .comment-text li,
+  .journal-entry-text li { margin: 0.1em 0; }
   .task-steps-block { padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .task-steps-inner { width: 100%; padding-left: 0; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 10px; }
   .task-steps-inner > .btn-add-subtask,
@@ -1927,6 +1942,23 @@ function onDocumentKeydownWordCaret(e) {
 }
 document.addEventListener('keydown', onDocumentKeydownWordCaret);
 
+/** Cmd/Ctrl+B bold, Cmd/Ctrl+I italic — wrap selection with markdown markers in rich desc fields. */
+function onDocumentKeydownRichDescFormat(e) {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+  const el = e.target;
+  if (!el || el.tagName !== 'TEXTAREA' || !el.classList || !el.classList.contains('rich-desc-input')) return;
+  const k = e.key.toLowerCase();
+  if (k !== 'b' && k !== 'i') return;
+  if (!descFormatMod || typeof descFormatMod.wrapSelectionMarkers !== 'function') return;
+  e.preventDefault();
+  const open = k === 'b' ? '**' : '*';
+  const r = descFormatMod.wrapSelectionMarkers(el.value, el.selectionStart, el.selectionEnd, open, open);
+  el.value = r.value;
+  if (typeof el.setSelectionRange === 'function') el.setSelectionRange(r.start, r.end);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+document.addEventListener('keydown', onDocumentKeydownRichDescFormat);
+
 function snapshotGoalNestedDraft() {
   const gid = goalSubComposerFor;
   if (!gid) return;
@@ -2078,6 +2110,19 @@ async function getCapacityModule() {
   } catch (e) {
     console.warn('Planner: capacity module not available', e);
     capacityMod = null;
+    return null;
+  }
+}
+
+let descFormatMod = null;
+async function getDescFormatModule() {
+  if (descFormatMod) return descFormatMod;
+  try {
+    descFormatMod = await import('./js/desc-format.js');
+    return descFormatMod;
+  } catch (e) {
+    console.warn('Planner: desc-format module not available', e);
+    descFormatMod = null;
     return null;
   }
 }
@@ -2294,6 +2339,7 @@ async function load() {
     await getPersistModule();
     await getScheduleModule();
     await getCapacityModule();
+    await getDescFormatModule();
     let loaded = false;
 
     if (persistModuleCache) {
@@ -2706,6 +2752,9 @@ function descLinkifyToHtml(raw) {
 function descPreviewInnerHTML(raw) {
   const v = String(raw || '');
   if (!v.trim()) return '';
+  if (descFormatMod && typeof descFormatMod.descPreviewInnerHTML === 'function') {
+    return descFormatMod.descPreviewInnerHTML(v);
+  }
   return descLinkifyToHtml(v);
 }
 function updateRichDescPreviewEl(ta, prev, shell) {
@@ -4049,12 +4098,13 @@ function taskTagsPickerHTML(tid) {
 function toggleTaskTag(tid, tagId) {
   const t = data.tasks.find(x => x.id === tid);
   if (!t) return;
+  flushTaskCardFields(tid);
   ensureTagIdsOnTask(t);
   const i = t.tagIds.indexOf(tagId);
   if (i >= 0) t.tagIds.splice(i, 1);
   else t.tagIds.push(tagId);
   save();
-  renderTasks();
+  refreshTaskLists();
 }
 
 function goalSummaryTagPills(g) {
@@ -6426,81 +6476,44 @@ function runGlobalSearch(query) {
   const hits = [];
 
   for (const t of data.tasks) {
-    if (textMatches(t.text, needle)) {
-      hits.push({
-        section: 'Tasks',
-        typeLabel: 'Task',
-        title: t.text,
-        snippet: snippetAround(t.text, needle),
-        ref: { t: 'task', id: t.id },
-      });
-    }
-    if (textMatches(t.description || '', needle)) {
-      hits.push({
-        section: 'Tasks',
-        typeLabel: 'Task · description',
-        title: t.text,
-        snippet: snippetAround(t.description || '', needle),
-        ref: { t: 'task', id: t.id, tab: 'steps' },
-      });
-    }
-    for (const c of t.comments || []) {
-      if (textMatches(c.text, needle)) {
-        hits.push({
-          section: 'Tasks',
-          typeLabel: 'Task · comment',
-          title: t.text,
-          snippet: snippetAround(c.text, needle),
-          ref: { t: 'task', id: t.id, tab: 'comments' },
-        });
+    let snippetSrc = null;
+    if (textMatches(t.text, needle)) snippetSrc = t.text;
+    else if (textMatches(t.description || '', needle)) snippetSrc = t.description || '';
+    else {
+      for (const c of t.comments || []) {
+        if (textMatches(c.text, needle)) { snippetSrc = c.text; break; }
       }
-    }
-    for (const l of t.links || []) {
-      if (textMatches(l.label, needle) || textMatches(l.url, needle)) {
-        const line = (l.label || '') + (l.url ? ' · ' + l.url : '');
-        hits.push({
-          section: 'Tasks',
-          typeLabel: 'Task · resource',
-          title: t.text,
-          snippet: snippetAround(line, needle),
-          ref: { t: 'task', id: t.id, tab: 'links' },
-        });
-      }
-    }
-    for (const m of t.milestones || []) {
-      if (textMatches(m.text, needle)) {
-        hits.push({
-          section: 'Tasks',
-          typeLabel: 'Step',
-          title: t.text,
-          snippet: snippetAround(m.text, needle),
-          ref: { t: 'task', id: t.id, tab: 'steps', mid: m.id },
-        });
-      }
-      for (const c of m.comments || []) {
-        if (textMatches(c.text, needle)) {
-          hits.push({
-            section: 'Tasks',
-            typeLabel: 'Step · comment',
-            title: t.text + ' — ' + m.text,
-            snippet: snippetAround(c.text, needle),
-            ref: { t: 'task', id: t.id, tab: 'steps', mid: m.id },
-          });
+      if (snippetSrc == null) {
+        for (const l of t.links || []) {
+          if (textMatches(l.label, needle) || textMatches(l.url, needle)) {
+            snippetSrc = (l.label || '') + (l.url ? ' · ' + l.url : '');
+            break;
+          }
         }
       }
-      for (const l of m.links || []) {
-        if (textMatches(l.label, needle) || textMatches(l.url, needle)) {
-          const line = (l.label || '') + (l.url ? ' · ' + l.url : '');
-          hits.push({
-            section: 'Tasks',
-            typeLabel: 'Step · resource',
-            title: t.text + ' — ' + m.text,
-            snippet: snippetAround(line, needle),
-            ref: { t: 'task', id: t.id, tab: 'steps', mid: m.id },
-          });
+      if (snippetSrc == null) {
+        outer: for (const m of t.milestones || []) {
+          if (textMatches(m.text, needle)) { snippetSrc = m.text; break; }
+          for (const c of m.comments || []) {
+            if (textMatches(c.text, needle)) { snippetSrc = c.text; break outer; }
+          }
+          for (const l of m.links || []) {
+            if (textMatches(l.label, needle) || textMatches(l.url, needle)) {
+              snippetSrc = (l.label || '') + (l.url ? ' · ' + l.url : '');
+              break outer;
+            }
+          }
         }
       }
     }
+    if (snippetSrc == null) continue;
+    hits.push({
+      section: 'Tasks',
+      typeLabel: 'Task',
+      title: t.text,
+      snippet: snippetAround(snippetSrc, needle),
+      ref: { t: 'task', id: t.id },
+    });
   }
 
   for (const n of data.notes) {
