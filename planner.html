@@ -120,7 +120,14 @@
     height: 100vh;
     box-sizing: border-box;
   }
-  .main { flex: 1; min-width: 0; padding: 11px 32px 32px 32px; max-width: 832px; }
+  .main {
+    flex: 0 1 832px;
+    width: 100%;
+    min-width: 0;
+    max-width: 832px;
+    margin-inline: auto;
+    padding: 11px 32px 32px 32px;
+  }
   /* Sidebar logo — Figma Widgets node 200:2130 */
   .logo {
     display: flex;
@@ -362,6 +369,7 @@
 
   /* Tasks, Goals & Journal panels — Figma Widgets */
   #panel-tasks.tasks-panel-figma,
+  #panel-upcoming.tasks-panel-figma,
   #panel-logbook.tasks-panel-figma,
   #panel-goals.goals-panel-figma,
   #panel-journal.journal-panel-figma {
@@ -376,13 +384,37 @@
     overflow-x: clip;
   }
   #panel-tasks .tasks-page-head,
+  #panel-upcoming .tasks-page-head,
   #panel-logbook .tasks-page-head,
   #panel-goals .goals-page-head,
   #panel-journal .journal-page-head { padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
   #panel-tasks .tasks-page-title,
+  #panel-upcoming .tasks-page-title,
   #panel-logbook .tasks-page-title,
   #panel-goals .goals-page-title,
   #panel-journal .journal-page-title { font-size: 22px; font-weight: 500; margin: 0; }
+  .upcoming-day { margin: 8px 0 20px; }
+  .upcoming-day-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 4px 0 10px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .upcoming-day-num {
+    font-size: 28px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: var(--text);
+  }
+  .upcoming-day-name {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .upcoming-day-empty { font-size: 13px; color: var(--text3); padding: 4px 0 8px; }
   #panel-tasks .stats-row.tasks-stats-figma,
   #panel-logbook .stats-row.tasks-stats-figma,
   #panel-goals .stats-row.goals-stats-figma,
@@ -736,6 +768,10 @@
   .task-desc-preview:empty { display: none; }
   a.task-desc-link { color: var(--blue); text-decoration: underline; cursor: pointer; }
   a.task-desc-link:hover { color: #1d4ed8; }
+  .task-desc-preview strong,
+  .note-body-text strong,
+  .comment-text strong,
+  .journal-entry-text strong { font-weight: 600; }
   .task-desc-preview ul.task-desc-list,
   .task-desc-preview ol.task-desc-list,
   .note-body-text ul.task-desc-list,
@@ -1289,6 +1325,10 @@
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5 1.5v3M11 1.5v3"/></svg>
       Today
     </button>
+    <button type="button" class="nav-btn" data-tab="upcoming" onclick="switchTab('upcoming', this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 7h12M5 1.5v3M11 1.5v3M5.5 10h2M8.5 10h2"/></svg>
+      Upcoming
+    </button>
     <button type="button" class="nav-btn" data-tab="tasks" onclick="switchTab('tasks', this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
       Tasks
@@ -1354,6 +1394,23 @@
         <input type="text" id="today-filter-jira" placeholder="Jira key…" aria-label="Jira filter" oninput="onTodayFilterChange()">
       </div>
       <div id="today-list"></div>
+    </div>
+
+    <!-- UPCOMING -->
+    <div id="panel-upcoming" class="panel tasks-panel-figma">
+      <div class="tasks-page-head">
+        <h1 class="tasks-page-title">Upcoming</h1>
+      </div>
+      <div class="today-filters" id="upcoming-filters">
+        <div class="today-prio-chips" id="upcoming-prio-chips" role="group" aria-label="Priority filter">
+          <button type="button" class="today-prio-chip active" data-p="" onclick="setUpcomingPriorityFilter('')" aria-pressed="true">All</button>
+          <button type="button" class="today-prio-chip p1" data-p="p1" onclick="setUpcomingPriorityFilter('p1')" aria-pressed="false">P1</button>
+          <button type="button" class="today-prio-chip p2" data-p="p2" onclick="setUpcomingPriorityFilter('p2')" aria-pressed="false">P2</button>
+          <button type="button" class="today-prio-chip p3" data-p="p3" onclick="setUpcomingPriorityFilter('p3')" aria-pressed="false">P3</button>
+          <button type="button" class="today-prio-chip p4" data-p="p4" onclick="setUpcomingPriorityFilter('p4')" aria-pressed="false">P4</button>
+        </div>
+      </div>
+      <div id="upcoming-list"></div>
     </div>
 
     <!-- TASKS (backlog) -->
@@ -1712,13 +1769,16 @@ let composerDraftCat = 'work';
 let composerDraftPriority = 'p3';
 let composerDraftTitle = '';
 let composerDraftDesc = '';
-/** @type {'do'|'promise'|'wait'} */
+/** @type {'do'|'promise'|'wait'|'park'} */
 let composerDraftKind = 'do';
 let composerDraftPerson = '';
 let composerDraftWhen = '';
+/** @type {string[]} */
+let composerDraftTagIds = [];
 let todayFilterPriority = '';
 let todayFilterPerson = '';
 let todayFilterJira = '';
+let upcomingFilterPriority = '';
 /** @type {'day'|'evening'|'morning'} */
 let todayMode = 'day';
 let morningPickIds = {};
@@ -1737,8 +1797,12 @@ function snapshotTaskComposerDraft() {
   if (!taskComposerOpen) return;
   const ti = document.getElementById('composer-task-title');
   const td = document.getElementById('composer-task-desc');
+  const personEl = document.getElementById('composer-person');
+  const whenEl = document.getElementById('composer-when');
   if (ti) composerDraftTitle = ti.value;
   if (td) composerDraftDesc = td.value;
+  if (personEl) composerDraftPerson = personEl.value;
+  if (whenEl) composerDraftWhen = whenEl.value;
 }
 const cardExpandTimers = {};
 const CARD_MOTION_SEL = '.task-item-figma, .goal-item-figma, .journal-item-figma, .task-step-item, .goal-step-item';
@@ -2152,6 +2216,14 @@ function todayYmdLocal(d = new Date()) {
   const day = String(d.getDate()).padStart(2, '0');
   return y + '-' + m + '-' + day;
 }
+function defaultComposerWhenForActivePanel() {
+  if (isPanelActive('today')) return snapWorkday(todayYmdLocal()) || todayYmdLocal();
+  if (isPanelActive('upcoming')) {
+    const tmr = addDaysYmdLocal(todayYmdLocal(), 1);
+    return snapWorkday(tmr) || tmr;
+  }
+  return '';
+}
 
 function snapWorkday(ymd) {
   const noWeekends = !(data && data.settings && data.settings.noWeekends === false);
@@ -2166,6 +2238,7 @@ function isPanelActive(tab) {
 
 function refreshTaskLists() {
   renderToday();
+  renderUpcoming();
   renderTasks();
   renderLogbook();
 }
@@ -2960,6 +3033,7 @@ function switchTab(tab, btn, opts) {
     renderTagsPanel();
   }
   if (tab === 'today') renderToday();
+  else if (tab === 'upcoming') renderUpcoming();
   else if (tab === 'tasks') renderTasks();
   else if (tab === 'logbook') renderLogbook();
   else if (tab === 'goals') renderGoals();
@@ -2973,38 +3047,36 @@ function switchTab(tab, btn, opts) {
 }
 
 // ── TASKS ──────────────────────────────────────────
+function resetComposerDraftFields() {
+  composerDraftTitle = '';
+  composerDraftDesc = '';
+  composerDraftPerson = '';
+  composerDraftWhen = '';
+  composerDraftTagIds = [];
+}
 function toggleTaskComposer(preset) {
   taskComposerOpen = !taskComposerOpen;
   if (taskComposerOpen) {
     composerDraftCat = 'work';
     composerDraftPriority = 'p3';
-    composerDraftTitle = '';
-    composerDraftDesc = '';
-    composerDraftPerson = '';
-    applyComposerPreset(preset || (isPanelActive('today') ? 'do' : 'do'), false);
-    if (isPanelActive('today') && !composerDraftWhen) {
-      composerDraftWhen = snapWorkday(todayYmdLocal()) || todayYmdLocal();
-    }
+    resetComposerDraftFields();
+    applyComposerPreset(preset || 'do', false);
+    if (!composerDraftWhen) composerDraftWhen = defaultComposerWhenForActivePanel();
     pendingFocusTaskComposer = true;
   } else {
-    composerDraftTitle = '';
-    composerDraftDesc = '';
-    composerDraftPerson = '';
-    composerDraftWhen = '';
+    resetComposerDraftFields();
     pendingFocusTaskComposer = false;
   }
   withCardMotion(() => refreshTaskLists());
 }
 function cancelTaskComposer() {
   taskComposerOpen = false;
-  composerDraftTitle = '';
-  composerDraftDesc = '';
-  composerDraftPerson = '';
-  composerDraftWhen = '';
+  resetComposerDraftFields();
   pendingFocusTaskComposer = false;
   withCardMotion(() => refreshTaskLists());
 }
 function applyComposerPreset(preset, rerender) {
+  snapshotTaskComposerDraft();
   const p = String(preset || 'do').toLowerCase();
   if (p === 'promise') {
     composerDraftKind = 'promise';
@@ -3015,13 +3087,41 @@ function applyComposerPreset(preset, rerender) {
   } else {
     composerDraftKind = 'do';
   }
-  if (isPanelActive('today') && !composerDraftWhen) {
-    composerDraftWhen = snapWorkday(todayYmdLocal()) || todayYmdLocal();
-  }
+  if (!composerDraftWhen) composerDraftWhen = defaultComposerWhenForActivePanel();
   if (rerender !== false) refreshTaskLists();
 }
 function setComposerDraftCat(v) {
   composerDraftCat = normalizeTaskCat(v);
+  refreshTaskLists();
+}
+function setComposerDraftKind(v) {
+  snapshotTaskComposerDraft();
+  const next = normalizeKind(v);
+  composerDraftKind = next;
+  if (next === 'wait') composerDraftPriority = 'p3';
+  if (next === 'park') composerDraftWhen = '';
+  else if (!composerDraftWhen) composerDraftWhen = defaultComposerWhenForActivePanel();
+  refreshTaskLists();
+}
+function composerScheduleToday() {
+  snapshotTaskComposerDraft();
+  composerDraftWhen = snapWorkday(todayYmdLocal()) || todayYmdLocal();
+  if (composerDraftKind === 'park') composerDraftKind = 'do';
+  refreshTaskLists();
+}
+function composerMoveToBacklog() {
+  snapshotTaskComposerDraft();
+  composerDraftWhen = '';
+  if (composerDraftKind !== 'wait' && composerDraftKind !== 'promise') composerDraftKind = 'park';
+  refreshTaskLists();
+}
+function toggleComposerDraftTag(tagId) {
+  snapshotTaskComposerDraft();
+  const id = String(tagId || '');
+  if (!id) return;
+  const i = composerDraftTagIds.indexOf(id);
+  if (i >= 0) composerDraftTagIds.splice(i, 1);
+  else composerDraftTagIds.push(id);
   refreshTaskLists();
 }
 function syncComposerAddBtn() {
@@ -3050,9 +3150,7 @@ function addTaskFromComposer() {
   const kind = normalizeKind(composerDraftKind);
   if ((kind === 'wait' || kind === 'promise') && !composerDraftPerson) return;
   let when = composerDraftWhen ? snapWorkday(composerDraftWhen) : null;
-  if (isPanelActive('today') && !when && kind !== 'park') {
-    when = snapWorkday(todayYmdLocal()) || todayYmdLocal();
-  }
+  if (!when && kind !== 'park') when = defaultComposerWhenForActivePanel() || null;
   if ((kind === 'do' || kind === 'promise') && when) {
     const cap = computeCapacityFor(when);
     if (cap) {
@@ -3067,7 +3165,7 @@ function addTaskFromComposer() {
     description: descEl ? descEl.value.trim() : '',
     cat: composerDraftCat,
     priority: composerDraftPriority,
-    tagIds: [],
+    tagIds: normalizeTagIds(composerDraftTagIds),
     done: false,
     milestones: [],
     comments: [],
@@ -3083,10 +3181,7 @@ function addTaskFromComposer() {
   };
   data.tasks.push(normalizeTask(raw));
   taskComposerOpen = false;
-  composerDraftTitle = '';
-  composerDraftDesc = '';
-  composerDraftPerson = '';
-  composerDraftWhen = '';
+  resetComposerDraftFields();
   pendingFocusTaskComposer = false;
   save();
   refreshTaskLists();
@@ -3385,8 +3480,76 @@ function isTodayTask(t, day) {
   const k = normalizeKind(t.kind);
   return k === 'do' || k === 'promise' || k === 'wait';
 }
+function isUpcomingTask(t, today) {
+  if (!t || t.done || !t.scheduledOn) return false;
+  if (t.scheduledOn <= today) return false;
+  const k = normalizeKind(t.kind);
+  return k === 'do' || k === 'promise' || k === 'wait';
+}
+function parseYmdLocalFallback(ymd) {
+  if (scheduleMod && scheduleMod.parseYmdLocal) return scheduleMod.parseYmdLocal(ymd);
+  const m = String(ymd || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function addDaysYmdLocal(ymd, n) {
+  if (scheduleMod && scheduleMod.addDaysYmd) return scheduleMod.addDaysYmd(ymd, n);
+  const d = parseYmdLocalFallback(ymd);
+  if (!d) return null;
+  d.setDate(d.getDate() + (Number(n) || 0));
+  return todayYmdLocal(d);
+}
+function upcomingDayHeading(ymd, today) {
+  const d = parseYmdLocalFallback(ymd);
+  if (!d) return { dayNum: '', name: ymd };
+  const dayNum = String(d.getDate());
+  const tomorrow = addDaysYmdLocal(today, 1);
+  const name = ymd === tomorrow ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'long' });
+  return { dayNum, name };
+}
+function buildUpcomingDaysLocal(today, scheduledYmds) {
+  if (scheduleMod && scheduleMod.buildUpcomingDateRange) {
+    return scheduleMod.buildUpcomingDateRange(today, scheduledYmds);
+  }
+  const start = addDaysYmdLocal(today, 1);
+  if (!start) return [];
+  let last = addDaysYmdLocal(start, 13);
+  for (const y of scheduledYmds) {
+    if (y && y > today && (!last || y > last)) last = y;
+  }
+  const out = [];
+  let cur = start;
+  let guard = 0;
+  while (cur && last && cur <= last && guard++ < 60) {
+    out.push(cur);
+    cur = addDaysYmdLocal(cur, 1);
+  }
+  return out;
+}
+function syncUpcomingPriorityChips() {
+  const wrap = document.getElementById('upcoming-prio-chips');
+  if (!wrap) return;
+  const cur = upcomingFilterPriority || '';
+  wrap.querySelectorAll('.today-prio-chip').forEach((btn) => {
+    const on = (btn.getAttribute('data-p') || '') === cur;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+function setUpcomingPriorityFilter(p) {
+  const next = p === 'p1' || p === 'p2' || p === 'p3' || p === 'p4' ? p : '';
+  upcomingFilterPriority = upcomingFilterPriority === next ? '' : next;
+  syncUpcomingPriorityChips();
+  renderUpcoming();
+}
+function taskMatchesUpcomingFilters(t) {
+  if (upcomingFilterPriority && normalizeTaskPriority(t.priority) !== upcomingFilterPriority) return false;
+  return true;
+}
 function isBacklogOpenTask(t, day) {
   if (!t || t.done) return false;
+  if (isUpcomingTask(t, day)) return false;
   const k = normalizeKind(t.kind);
   if (k === 'park') return true;
   if (!t.scheduledOn) return true;
@@ -3396,7 +3559,9 @@ function isBacklogOpenTask(t, day) {
 function tabForTask(t) {
   if (!t) return 'tasks';
   if (t.done) return 'logbook';
-  if (isTodayTask(t, todayYmdLocal())) return 'today';
+  const day = todayYmdLocal();
+  if (isTodayTask(t, day)) return 'today';
+  if (isUpcomingTask(t, day)) return 'upcoming';
   return 'tasks';
 }
 function setTaskCat(id, cat) {
@@ -4037,6 +4202,31 @@ function taskDayToolbarHTML(t) {
     ${k === 'wait' ? `<input type="text" placeholder="Waiting on…" value="${esc(t.waitingOn || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.waitingOn=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
     ${k === 'promise' ? `<input type="text" placeholder="Promised to…" value="${esc(t.promisedTo || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.promisedTo=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
   </div>`;
+}
+function composerDayToolbarHTML() {
+  const k = normalizeKind(composerDraftKind);
+  const when = composerDraftWhen || '';
+  return `<div class="task-day-toolbar" onclick="event.stopPropagation()">
+    <label>Kind <select aria-label="Kind" onchange="setComposerDraftKind(this.value)">
+      ${TASK_KINDS.map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${x}</option>`).join('')}
+    </select></label>
+    <label>When <input type="date" id="composer-when" aria-label="Schedule date" value="${esc(when)}" onchange="composerDraftWhen=this.value;syncComposerAddBtn()"></label>
+    <button type="button" class="btn btn--outline btn--dense" onclick="composerScheduleToday()">Today</button>
+    <button type="button" class="btn btn--outline btn--dense" onclick="composerMoveToBacklog()">Backlog</button>
+    ${k === 'wait' ? `<input type="text" id="composer-person" placeholder="Waiting on…" value="${esc(composerDraftPerson)}" oninput="syncComposerAddBtn()">` : ''}
+    ${k === 'promise' ? `<input type="text" id="composer-person" placeholder="Promised to…" value="${esc(composerDraftPerson)}" oninput="syncComposerAddBtn()">` : ''}
+  </div>`;
+}
+function composerTagsPickerHTML() {
+  const selected = new Set(normalizeTagIds(composerDraftTagIds));
+  const tags = sortedTagsForUi();
+  if (!tags.length) {
+    return '<div class="task-tags-row"><span style="font-size:12px;color:var(--text3)">No tags yet — open <strong>Tags</strong> in the sidebar to create some.</span></div>';
+  }
+  return `<div class="task-tags-row">${tags.map(tag => {
+    const on = selected.has(tag.id);
+    return `<button type="button" class="task-tag-chip${on ? ' is-on' : ''}" onclick="toggleComposerDraftTag('${tag.id}')">${esc(tag.name)}</button>`;
+  }).join('')}</div>`;
 }
 function ensureTagsArray() {
   if (!Array.isArray(data.tags)) data.tags = [];
@@ -4701,8 +4891,6 @@ function taskComposerHTML() {
   const L = taskCatLabels();
   const keys = ['work', 'personal', 'urgent'];
   const kind = normalizeKind(composerDraftKind);
-  const needPerson = kind === 'wait' || kind === 'promise';
-  const whenVal = composerDraftWhen || '';
   return `<div class="new-task-card" id="task-composer-card">
     <div class="today-composer-presets" role="group" aria-label="Capture preset">
       <button type="button" class="btn btn--outline btn--dense${kind === 'do' ? ' active' : ''}" onclick="applyComposerPreset('do')">Quick Do</button>
@@ -4717,15 +4905,16 @@ function taskComposerHTML() {
       onclick="event.stopPropagation()" onfocus="onComposerDescFocus()" oninput="onComposerDescInput()" onblur="onComposerDescBlur()">${esc(composerDraftDesc)}</textarea>
     <div id="composer-task-desc-preview" class="task-desc-preview" onclick="focusComposerDescFromPreview(event)" onmousedown="if(!event.target.closest('a.task-desc-link'))event.stopPropagation()"${!String(composerDraftDesc).trim() ? ' style="display:none"' : ''}>${descPreviewInnerHTML(composerDraftDesc)}</div>
     </div>
-    ${needPerson || isPanelActive('today') ? `<div class="new-task-tertiary-row" style="gap:8px">
-      ${needPerson ? `<input type="text" id="composer-person" placeholder="${kind === 'wait' ? 'Waiting on…' : 'Promised to…'}" value="${esc(composerDraftPerson)}" oninput="syncComposerAddBtn()" style="flex:1;min-width:120px;font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)">` : ''}
-      <input type="date" id="composer-when" aria-label="Schedule date" value="${esc(whenVal)}" onchange="composerDraftWhen=this.value;syncComposerAddBtn()">
-    </div>` : ''}
     <div class="new-task-tertiary-row">
       ${composerPriorityDropdownHTML()}
       <div class="composer-cat-row composer-cat-row--contents" role="group" aria-label="Category">
         ${keys.map(v => `<button type="button" class="composer-cat-pill ${v}${k === v ? ' active' : ''}" onclick="setComposerDraftCat('${v}')">${esc(L[v])}</button>`).join('')}
       </div>
+    </div>
+    ${composerDayToolbarHTML()}
+    <div class="task-tags-block" onclick="event.stopPropagation()">
+      <div class="task-tags-label">Tags</div>
+      ${composerTagsPickerHTML()}
     </div>
     <div class="new-task-card-footer">
       <button type="button" class="btn btn--secondary" onclick="cancelTaskComposer()">Cancel</button>
@@ -5444,6 +5633,77 @@ function renderToday() {
     }
     data.tasks.forEach(t => {
       if (expandedTasks[t.id] && isTodayTask(t, day)) {
+        updateTaskDescPreview(t.id);
+        const tinp = document.getElementById('task-title-inp-' + t.id);
+        if (tinp && tinp.classList && tinp.classList.contains('task-main-title-field')) autoGrowDescTextarea(tinp);
+      }
+    });
+  });
+}
+
+function renderUpcoming() {
+  snapshotNestedComposerDraft();
+  snapshotTaskComposerDraft();
+  syncUpcomingPriorityChips();
+  const el = document.getElementById('upcoming-list');
+  if (!el) return;
+  const today = todayYmdLocal();
+  const future = data.tasks.filter(t => isUpcomingTask(t, today));
+  const byDay = {};
+  for (const t of future) {
+    const y = t.scheduledOn;
+    if (!byDay[y]) byDay[y] = [];
+    byDay[y].push(t);
+  }
+  const days = buildUpcomingDaysLocal(today, Object.keys(byDay));
+  const parts = [];
+  if (!days.length) {
+    parts.push('<div class="task-list-empty-hint">Nothing scheduled ahead.</div>');
+  } else {
+    for (const ymd of days) {
+      const { dayNum, name } = upcomingDayHeading(ymd, today);
+      const items = (byDay[ymd] || []).filter(taskMatchesUpcomingFilters);
+      parts.push(`<section class="upcoming-day" aria-label="${esc(ymd)}">
+        <div class="upcoming-day-head"><span class="upcoming-day-num">${esc(dayNum)}</span><span class="upcoming-day-name">${esc(name)}</span></div>`);
+      if (!items.length) parts.push('<div class="upcoming-day-empty"></div>');
+      else parts.push(items.map(taskItemHTML).join(''));
+      parts.push('</section>');
+    }
+  }
+  if (isPanelActive('upcoming')) {
+    parts.push('<button type="button" class="btn-add-task-link" onclick="toggleTaskComposer(\'do\')"><svg class="btn-add-task-plus-icon" width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 5H11V6H6V11H5V6H0V5H5V0H6V5Z"/></svg> Add Task</button>');
+    parts.push(taskComposerHTML());
+  }
+  el.innerHTML = parts.join('');
+  const focusTaskTitleId = pendingFocusTaskTitleId;
+  if (isPanelActive('upcoming')) pendingFocusTaskTitleId = null;
+  if (taskComposerOpen && isPanelActive('upcoming')) {
+    requestAnimationFrame(() => {
+      syncComposerAddBtn();
+      const focusComposerTitle = pendingFocusTaskComposer;
+      pendingFocusTaskComposer = false;
+      if (focusComposerTitle) {
+        const inp = document.getElementById('composer-task-title');
+        if (inp) {
+          inp.focus();
+          if (typeof inp.setSelectionRange === 'function') {
+            const len = inp.value.length;
+            inp.setSelectionRange(len, len);
+          }
+        }
+      }
+    });
+  }
+  requestAnimationFrame(() => {
+    if (isPanelActive('upcoming') && focusTaskTitleId) {
+      const inp = document.getElementById('task-title-inp-' + focusTaskTitleId);
+      if (inp) {
+        inp.focus();
+        if (inp.classList && inp.classList.contains('task-main-title-field')) autoGrowDescTextarea(inp);
+      }
+    }
+    data.tasks.forEach(t => {
+      if (expandedTasks[t.id] && isUpcomingTask(t, today)) {
         updateTaskDescPreview(t.id);
         const tinp = document.getElementById('task-title-inp-' + t.id);
         if (tinp && tinp.classList && tinp.classList.contains('task-main-title-field')) autoGrowDescTextarea(tinp);
@@ -6695,6 +6955,9 @@ function openSearchHit(i) {
         if (jiraEl) jiraEl.value = '';
         syncTodayPriorityChips();
       }
+    } else if (tab === 'upcoming' && !taskMatchesUpcomingFilters(t)) {
+      upcomingFilterPriority = '';
+      syncUpcomingPriorityChips();
     } else if (tab === 'tasks' && !taskMatchesActiveTagFilters(t)) {
       taskTagFilterIds = [];
     }

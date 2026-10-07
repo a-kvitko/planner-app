@@ -3,13 +3,14 @@
     {
       "id": "muv1pxlgdcfo",
       "text": "P3 👀 DR Orlova [TDWEB-18342] Client Area - client account is shown for Watchlist",
-      "description": "2026-10-06 — 2026-10-06 — Today P1. Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash\n\n07.10.2026: No, we cannot remove the second line of the widget header because this is a common layout for all dxTrade headers.\nI see two possible solutions:\n- Simple one — just remove “Account” from the WH.\n- Alternative — replace “Account” with the \"Admin\" name.\nNow: I'm waiting for Orlova's decition",
+      "description": "2026-10-06 — 2026-10-06 — Today P1. Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash\n\n**07.10.2026:** No, we cannot remove the second line of the widget header because this is a common layout for all dxTrade headers.\nI see two possible solutions:\n- Simple one — just remove “Account” from the WH.\n- Alternative — replace “Account” with the \"Admin\" name.\nNow: I'm waiting for Orlova's decition",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
         "mnyawsv6pszp",
         "mnrzzd57bino",
         "mns00n4rgrjt",
+        "muvcyvin4j33",
         "mnyaxsgr89pj",
         "mnyawq89hy4y",
         "mnyawmpwt18t",
@@ -35,14 +36,15 @@
     },
     {
       "id": "muwg5z2ba9vu",
-      "text": "Kasperovich — Live mode vs global actions UX",
-      "description": "2026-10-06 — 2026-10-06 — Today. Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).\n\n06.10.2026: I suggested a solution in the ticket. Waiting for the BAs reply",
+      "text": "P3 👀 Kasperovich + Danny D — Live mode vs global actions UX",
+      "description": "https://jira.in.devexperts.com/browse/TDWADMIN-7811\n- **07.10.2026:** I proposed 2 options. Now I'm waiting for Danny D decition\n- **06.10.2026:** suggested 2 options to Danny D. Waiting for his decition\n- **10.06.2026:** Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
+        "mnrzzd57bino",
+        "mns00n4rgrjt",
         "mnyawsv6pszp",
-        "mns006zuavff",
-        "mnrzzz5deeaw"
+        "mns006zuavff"
       ],
       "done": false,
       "milestones": [],
@@ -50,8 +52,8 @@
       "links": [],
       "progress": 0,
       "ts": 1791277150403,
-      "kind": "promise",
-      "scheduledOn": "2026-10-07",
+      "kind": "wait",
+      "scheduledOn": "2026-10-08",
       "deadline": null,
       "waitingOn": null,
       "promisedTo": "Kasperovich",
@@ -1632,11 +1634,7 @@
       "description": "",
       "cat": "work",
       "priority": "p3",
-      "tagIds": [
-        "mnrzzd57bino",
-        "mnyawq89hy4y",
-        "mns006zuavff"
-      ],
+      "tagIds": [],
       "done": false,
       "milestones": [],
       "comments": [],
@@ -1644,7 +1642,7 @@
       "progress": 0,
       "ts": 1791289310440,
       "kind": "do",
-      "scheduledOn": "2026-10-07",
+      "scheduledOn": "2026-10-06",
       "waitingOn": null,
       "promisedTo": null,
       "nextCheckAt": null,
@@ -1679,6 +1677,63 @@
       "rolloverCount": 0,
       "project": "work",
       "jiraKey": "TDWEB-18389"
+    },
+    {
+      "id": "muy4jt9nko88",
+      "text": "Plugin for Figma — Make the data relevant",
+      "description": "",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mns00jqz9s73",
+        "mnyawv54zt29"
+      ],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791378573035,
+      "kind": "park",
+      "scheduledOn": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "deadline": null,
+      "timeEstimateMin": null,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
+    },
+    {
+      "id": "muy76uv09mey",
+      "text": "CR Kasperovich [TDWEB-18382] [Web Admin] Detach Workspace: Tool description update",
+      "description": "- 07.10.2026: the design has been updated to both RN and RO files\n- RN is here — https://www.figma.com/design/aRqxryisyE3ZoXuQmYCTL3/TD-AT-%25F0%259F%258C%2590-RN?node-id=2-12565&t=v5T00XuAAQy2Wnb3-11\n- RO is here — https://www.figma.com/design/0ZRRxXS3kL6Q5IwyiW4WEe/TD-AT-%25F0%259F%258C%2590-RO?node-id=2-12565&t=ABSiCLyy13iVz30h-11",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mnrzzz5deeaw",
+        "mnrzzd57bino",
+        "mnyawsv6pszp"
+      ],
+      "done": true,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791383007420,
+      "kind": "do",
+      "scheduledOn": "2026-10-07",
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "deadline": null,
+      "timeEstimateMin": null,
+      "completedAt": "2026-10-07T14:24:03.405Z",
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWEB-18382"
     }
   ],
   "notes": [],
@@ -1820,5 +1875,5 @@
     "dayOverrides": {}
   },
   "schemaVersion": 2,
-  "updatedAt": "2026-10-07T13:43:42.596Z"
+  "updatedAt": "2026-10-07T14:26:33.306Z"
 }
