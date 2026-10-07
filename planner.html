@@ -162,7 +162,28 @@
   .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
   .panel { display: none; }
   .panel.active { display: block; }
-  .page-title { font-size: 22px; font-weight: 500; margin-bottom: 24px; }
+  /* Page headers — shared (Tasks is the reference) */
+  .page-head {
+    padding-bottom: 6px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-head--actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .page-head-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .page-head-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+  /* Content under the divider owns no extra top gap — spacing comes from .page-head */
+  .page-head + .section-label,
+  .page-head + p { margin-top: 0; }
 
   /* Input rows */
   .add-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -383,16 +404,6 @@
   #panel-journal.journal-panel-figma {
     overflow-x: clip;
   }
-  #panel-tasks .tasks-page-head,
-  #panel-upcoming .tasks-page-head,
-  #panel-logbook .tasks-page-head,
-  #panel-goals .goals-page-head,
-  #panel-journal .journal-page-head { padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
-  #panel-tasks .tasks-page-title,
-  #panel-upcoming .tasks-page-title,
-  #panel-logbook .tasks-page-title,
-  #panel-goals .goals-page-title,
-  #panel-journal .journal-page-title { font-size: 22px; font-weight: 500; margin: 0; }
   .upcoming-day { margin: 8px 0 20px; }
   .upcoming-day-head {
     display: flex;
@@ -418,7 +429,7 @@
   #panel-tasks .stats-row.tasks-stats-figma,
   #panel-logbook .stats-row.tasks-stats-figma,
   #panel-goals .stats-row.goals-stats-figma,
-  #panel-journal .stats-row.journal-stats-figma { gap: 14px; margin-bottom: 24px; padding-top: 17px; }
+  #panel-journal .stats-row.journal-stats-figma { gap: 14px; margin-bottom: 24px; padding-top: 0; }
   #panel-tasks .stats-row.tasks-stats-figma .stat,
   #panel-logbook .stats-row.tasks-stats-figma .stat,
   #panel-goals .stats-row.goals-stats-figma .stat,
@@ -1373,9 +1384,9 @@
   <main class="main">
     <!-- TODAY -->
     <div id="panel-today" class="panel tasks-panel-figma active">
-      <div class="tasks-page-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <h1 class="tasks-page-title" style="margin:0">Today</h1>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <div class="page-head page-head--actions">
+        <h1 class="page-head-title">Today</h1>
+        <div class="page-head-actions">
           <button type="button" class="btn btn-sm btn--soft" id="btn-morning-mode" onclick="setTodayMode('morning')">Morning</button>
           <button type="button" class="btn btn-sm btn--soft" id="btn-evening-mode" onclick="setTodayMode('evening')">Evening clear</button>
           <button type="button" class="btn btn-sm btn--soft" id="btn-day-mode" onclick="setTodayMode('day')" style="display:none">Back to Today</button>
@@ -1398,8 +1409,8 @@
 
     <!-- UPCOMING -->
     <div id="panel-upcoming" class="panel tasks-panel-figma">
-      <div class="tasks-page-head">
-        <h1 class="tasks-page-title">Upcoming</h1>
+      <div class="page-head">
+        <h1 class="page-head-title">Upcoming</h1>
       </div>
       <div class="today-filters" id="upcoming-filters">
         <div class="today-prio-chips" id="upcoming-prio-chips" role="group" aria-label="Priority filter">
@@ -1415,8 +1426,8 @@
 
     <!-- TASKS (backlog) -->
     <div id="panel-tasks" class="panel tasks-panel-figma">
-      <div class="tasks-page-head">
-        <h1 class="tasks-page-title">Tasks</h1>
+      <div class="page-head">
+        <h1 class="page-head-title">Tasks</h1>
       </div>
       <div id="task-dashboard-wrap" class="task-dashboard-wrap">
         <div class="stats-row tasks-stats-figma" id="task-stats"></div>
@@ -1427,8 +1438,8 @@
 
     <!-- LOGBOOK (completed tasks) -->
     <div id="panel-logbook" class="panel tasks-panel-figma">
-      <div class="tasks-page-head">
-        <h1 class="tasks-page-title">Logbook</h1>
+      <div class="page-head">
+        <h1 class="page-head-title">Logbook</h1>
       </div>
       <div class="stats-row tasks-stats-figma" id="logbook-stats"></div>
       <div id="logbook-list"></div>
@@ -1436,7 +1447,9 @@
 
     <!-- NOTES -->
     <div id="panel-notes" class="panel">
-      <div class="page-title">Notes</div>
+      <div class="page-head">
+        <h1 class="page-head-title">Notes</h1>
+      </div>
       <div class="add-bar">
         <input type="text" class="main" id="note-title" placeholder="Note title…" onkeydown="if(event.key==='Enter')document.getElementById('note-body').focus()">
         <select id="note-cat">
@@ -1459,8 +1472,8 @@
 
     <!-- GOALS -->
     <div id="panel-goals" class="panel goals-panel-figma">
-      <div class="goals-page-head">
-        <h1 class="goals-page-title">Goals</h1>
+      <div class="page-head">
+        <h1 class="page-head-title">Goals</h1>
       </div>
       <div id="goal-dashboard-wrap" class="goal-dashboard-wrap">
         <div class="stats-row goals-stats-figma" id="goal-stats"></div>
@@ -1471,7 +1484,9 @@
 
     <!-- SEARCH -->
     <div id="panel-search" class="panel">
-      <div class="page-title">Search</div>
+      <div class="page-head">
+        <h1 class="page-head-title">Search</h1>
+      </div>
       <div class="search-bar-wrap">
         <input type="text" class="search-input" id="global-search-input" placeholder="Search tasks, notes, goals, journal…" autocomplete="off">
         <div class="search-meta" id="global-search-meta">Type to search across all sections.</div>
@@ -1481,8 +1496,8 @@
 
     <!-- JOURNAL -->
     <div id="panel-journal" class="panel journal-panel-figma">
-      <div class="journal-page-head">
-        <h1 class="journal-page-title">Journal</h1>
+      <div class="page-head">
+        <h1 class="page-head-title">Journal</h1>
       </div>
       <div id="journal-dashboard-wrap" class="journal-dashboard-wrap">
         <div class="stats-row journal-stats-figma" id="journal-stats"></div>
@@ -1493,7 +1508,9 @@
 
     <!-- TAGS -->
     <div id="panel-tags" class="panel">
-      <div class="page-title">Tags</div>
+      <div class="page-head">
+        <h1 class="page-head-title">Tags</h1>
+      </div>
       <p style="font-size:13px;color:var(--text2);max-width:520px;margin-bottom:16px">Create tags and attach them to tasks, goals, notes, and journal entries. Order here controls how tags appear in pickers and filters.</p>
       <div class="add-bar">
         <input type="text" class="main" id="tag-new-name" placeholder="New tag name…" maxlength="80" autocomplete="off" onkeydown="if(event.key==='Enter')createTagFromPanel()">
@@ -1504,7 +1521,9 @@
 
     <!-- SETTINGS -->
     <div id="panel-settings" class="panel">
-      <div class="page-title">Settings</div>
+      <div class="page-head">
+        <h1 class="page-head-title">Settings</h1>
+      </div>
       <div class="section-label">Appearance</div>
       <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div>
@@ -3362,7 +3381,7 @@ function onTodayFilterChange() {
 function setTodayMode(mode) {
   todayMode = mode === 'evening' || mode === 'morning' ? mode : 'day';
   if (todayMode !== 'morning') morningPickIds = {};
-  const title = document.querySelector('#panel-today .tasks-page-title');
+  const title = document.querySelector('#panel-today .page-head-title');
   if (title) {
     title.textContent = todayMode === 'evening' ? 'Evening clear' : todayMode === 'morning' ? 'Morning plan' : 'Today';
   }

@@ -67,10 +67,12 @@
     {
       "id": "muwg5z2bmkfu",
       "text": "Glukhov [TDWEB-18129] wrap — ответить на вопросы",
-      "description": "2026-10-06 — 2026-10-06 — Today. Пинг 05.10 16:04: посмотрел, есть пару вопросов — ответа ещё нет.",
+      "description": "- 2026-10-06 — Today. Пинг 05.10 16:04: посмотрел, есть пару вопросов — ответа ещё нет.",
       "cat": "work",
-      "priority": "p1",
-      "tagIds": [],
+      "priority": "p3",
+      "tagIds": [
+        "mnyawsv6pszp"
+      ],
       "done": false,
       "milestones": [],
       "comments": [],
@@ -78,7 +80,7 @@
       "progress": 0,
       "ts": 1791277150403,
       "kind": "promise",
-      "scheduledOn": "2026-10-06",
+      "scheduledOn": "2026-10-07",
       "deadline": null,
       "waitingOn": null,
       "promisedTo": "Glukhov",
@@ -116,25 +118,28 @@
     },
     {
       "id": "muuxv4shkuvj",
-      "text": "Chameleon Plugin. Convert styles doesn’t work",
-      "description": "2026-10-06 — 2026-10-06 — снял с Today: слот под TDWEB-18342. Pavlyk Chameleon — backlog.\n2026-10-06 — 2026-10-06 — Pavlyk: пустой виджет при export styles; у тебя работает. Между делом понять почему. Slack DM 05.10.",
+      "text": "Chameleon Plugin. Convert styles doesn’t work for Nastya Pavlyk",
+      "description": "- 2026-10-06 — снял с Today: слот под TDWEB-18342. Pavlyk Chameleon — backlog.\n- 2026-10-06 — Pavlyk: пустой виджет при export styles; у тебя работает. Между делом понять почему. Slack DM 05.10.",
       "cat": "work",
       "priority": "p3",
-      "done": false,
+      "done": true,
       "milestones": [],
       "comments": [],
       "links": [],
-      "tagIds": [],
+      "tagIds": [
+        "mnyawsv6pszp",
+        "mns00jqz9s73"
+      ],
       "progress": 0,
       "ts": 1791185945345,
       "kind": "do",
-      "scheduledOn": null,
+      "scheduledOn": "2026-10-06",
       "deadline": null,
       "waitingOn": null,
       "promisedTo": null,
       "nextCheckAt": null,
       "timeEstimateMin": 15,
-      "completedAt": null,
+      "completedAt": "2026-10-07T14:42:46.618Z",
       "rolloverCount": 0,
       "project": "Plugins",
       "jiraKey": null
@@ -1875,5 +1880,5 @@
     "dayOverrides": {}
   },
   "schemaVersion": 2,
-  "updatedAt": "2026-10-07T14:26:33.306Z"
+  "updatedAt": "2026-10-07T14:43:54.826Z"
 }
