@@ -1989,6 +1989,14 @@ function isTextCaretField(el) {
   const t = (el.type || 'text').toLowerCase();
   return !t || t === 'text' || t === 'search' || t === 'url' || t === 'email' || t === 'tel' || t === 'password';
 }
+/** Space must type / activate controls — not open the task composer. */
+function isSpaceQuickAddBlockedTarget(el) {
+  if (!el || el === document.body || el === document.documentElement) return false;
+  if (isTextCaretField(el)) return true;
+  if (el.isContentEditable) return true;
+  if (typeof el.closest === 'function' && el.closest('input, textarea, select, button, a, summary, [role="button"], [contenteditable="true"]')) return true;
+  return false;
+}
 function textFieldWordBoundary(value, pos, dir) {
   const n = value.length;
   let i = Math.max(0, Math.min(n, pos));
@@ -2041,6 +2049,29 @@ function onDocumentKeydownRichDescFormat(e) {
   el.dispatchEvent(new Event('input', { bubbles: true }));
 }
 document.addEventListener('keydown', onDocumentKeydownRichDescFormat);
+
+/** Things-style: Space opens new-task composer on Today / Upcoming / Tasks when not typing. */
+function onDocumentKeydownQuickAddTask(e) {
+  if (e.key !== ' ' && e.code !== 'Space') return;
+  if (e.defaultPrevented || e.repeat) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+  if (!isPanelActive('today') && !isPanelActive('upcoming') && !isPanelActive('tasks')) return;
+  if (isSpaceQuickAddBlockedTarget(e.target)) return;
+  e.preventDefault();
+  if (taskComposerOpen) {
+    const inp = document.getElementById('composer-task-title');
+    if (inp) {
+      inp.focus();
+      if (typeof inp.setSelectionRange === 'function') {
+        const len = inp.value.length;
+        inp.setSelectionRange(len, len);
+      }
+    }
+    return;
+  }
+  toggleTaskComposer('do');
+}
+document.addEventListener('keydown', onDocumentKeydownQuickAddTask);
 
 function snapshotGoalNestedDraft() {
   const gid = goalSubComposerFor;
