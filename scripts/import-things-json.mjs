@@ -16,7 +16,7 @@ const dumpPath =
   process.argv[2] ||
   path.join(__dirname, '../backups/things-work-dump-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.json');
 
-const KINDS = ['do', 'wait', 'promise', 'park'];
+const KINDS = ['ongoing', 'do', 'wait', 'promise', 'park'];
 const PRIOS = ['p1', 'p2', 'p3', 'p4'];
 
 function uid() {
@@ -24,7 +24,8 @@ function uid() {
 }
 
 function normalizeKind(k) {
-  const s = String(k || '').toLowerCase();
+  let s = String(k || '').toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (s === 'in progress' || s === 'in-progress' || s === 'inprogress') s = 'ongoing';
   return KINDS.includes(s) ? s : 'do';
 }
 
@@ -41,9 +42,9 @@ function parseTaskTitleHints(text) {
   const p = raw.match(/\bP([1-4])(?:\.\d+)?\b/i);
   if (p) out.priorityFromTitle = 'p' + p[1];
   const kindM =
-    raw.match(/\bP[1-4](?:\.\d+)?\s+(Do|Wait|Promise|Park)\b/i) ||
-    raw.match(/^(Do|Wait|Promise|Park)\s*[—\-:–]\s*/i);
-  if (kindM) out.kindFromTitle = kindM[1].toLowerCase();
+    raw.match(/\bP[1-4](?:\.\d+)?\s+(Do|Ongoing|In\s*Progress|Wait|Promise|Park)\b/i) ||
+    raw.match(/^(Do|Ongoing|In\s*Progress|Wait|Promise|Park)\s*[—\-:–]\s*/i);
+  if (kindM) out.kindFromTitle = kindM[1].toLowerCase().replace(/\s+/g, ' ');
   return out;
 }
 
@@ -57,7 +58,7 @@ function normTitle(s) {
   return String(s || '')
     .toLowerCase()
     .replace(/\s+/g, ' ')
-    .replace(/^p[1-4](?:\.\d+)?\s+(do|wait|promise|park)\s*[—\-:–]?\s*/i, '')
+    .replace(/^p[1-4](?:\.\d+)?\s+(do|ongoing|in\s*progress|wait|promise|park)\s*[—\-:–]?\s*/i, '')
     .replace(/^p[1-4](?:\.\d+)?[.\s—\-–]+/i, '')
     .trim();
 }
@@ -68,6 +69,7 @@ function mapThingsItemToTask(item) {
   const tags = tagsList(item).map((t) => t.toLowerCase());
   let kind = 'do';
   if (tags.some((t) => t === 'wait' || t === 'waiting')) kind = 'wait';
+  else if (tags.some((t) => t === 'ongoing' || t === 'in progress' || t === 'in-progress')) kind = 'ongoing';
   else if (tags.some((t) => t === 'promise')) kind = 'promise';
   else if (tags.some((t) => t === 'park' || t === 'someday')) kind = 'park';
   let priority = null;
@@ -135,7 +137,7 @@ async function main() {
 
   const imported = [];
   const skipped = [];
-  const kindCounts = { do: 0, wait: 0, promise: 0, park: 0 };
+  const kindCounts = { do: 0, ongoing: 0, wait: 0, promise: 0, park: 0 };
 
   for (const item of items) {
     const task = mapThingsItemToTask(item);

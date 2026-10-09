@@ -5,7 +5,7 @@
 import { snapToWorkday, todayYmd, parseYmdLocal } from './schedule.js';
 import { computeDayCapacity } from './capacity.js';
 
-const KINDS = ['do', 'wait', 'promise', 'park'];
+const KINDS = ['ongoing', 'do', 'wait', 'promise', 'park'];
 const PRIOS = ['p1', 'p2', 'p3', 'p4'];
 
 function uid() {
@@ -21,7 +21,8 @@ function findTask(state, id) {
 }
 
 function normalizeKind(k) {
-  const s = String(k || '').toLowerCase();
+  let s = String(k || '').toLowerCase().replace(/[_\s]+/g, ' ').trim();
+  if (s === 'in progress' || s === 'in-progress' || s === 'inprogress') s = 'ongoing';
   return KINDS.includes(s) ? s : 'do';
 }
 
@@ -214,10 +215,11 @@ export function buildDayView(state, date) {
   const capacity = computeDayCapacity(ymd, (state && state.settings) || {}, (state && state.tasks) || []);
   const tasks = ((state && state.tasks) || []).filter((t) => t && !t.done && t.scheduledOn === ymd);
   const sections = {
+    ongoing: tasks.filter((t) => t.kind === 'ongoing'),
     do: tasks.filter((t) => t.kind === 'do'),
     promise: tasks.filter((t) => t.kind === 'promise'),
     wait: tasks.filter((t) => t.kind === 'wait'),
-    other: tasks.filter((t) => t.kind !== 'do' && t.kind !== 'promise' && t.kind !== 'wait'),
+    other: tasks.filter((t) => !['do', 'ongoing', 'promise', 'wait'].includes(t.kind)),
   };
   return { date: ymd, capacity, sections, overload: !!capacity.overload };
 }
@@ -254,5 +256,9 @@ export function _selfCheck() {
   if (s2.tasks[0].scheduledOn !== '2026-09-14') throw new Error('weekend snap failed');
   const day = buildDayView(s2, '2026-09-14');
   if (day.sections.wait.length !== 1) throw new Error('day wait section empty');
+  const { state: s3 } = applyOps(s2, [{ op: 'setKind', id, kind: 'ongoing' }]);
+  const dayOn = buildDayView(s3, '2026-09-14');
+  if (dayOn.sections.ongoing.length !== 1) throw new Error('day ongoing section empty');
+  if (dayOn.capacity.doCount !== 0) throw new Error('ongoing must not count as Do');
   console.log('api-ops self-check: ok');
 }

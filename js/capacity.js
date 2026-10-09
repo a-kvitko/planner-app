@@ -166,10 +166,11 @@ export function _selfCheck() {
   }
   const withWait = computeDayCapacity('2026-09-14', settings, [
     { kind: 'wait', scheduledOn: '2026-09-14', done: false, timeEstimateMin: 200 },
+    { kind: 'ongoing', scheduledOn: '2026-09-14', done: false, timeEstimateMin: 120 },
     { kind: 'do', scheduledOn: '2026-09-14', done: false, timeEstimateMin: 45 }
   ]);
   if (withWait.plannedDoMinutes !== 45) {
-    throw new Error('Wait must not inflate Do minutes: ' + withWait.plannedDoMinutes);
+    throw new Error('Wait/ongoing must not inflate Do minutes: ' + withWait.plannedDoMinutes);
   }
   if (withWait.doCount !== 1 || withWait.waitCount !== 1) {
     throw new Error('do/wait counts wrong');
