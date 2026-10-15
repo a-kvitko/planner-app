@@ -426,6 +426,14 @@
     font-weight: 600;
     color: var(--text);
   }
+  .upcoming-day.is-past .upcoming-day-name { color: #c44; }
+  .past-leftover-pill {
+    font-size: 11px;
+    font-weight: 600;
+    color: #c44;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
   .upcoming-day-empty {
     font-size: 13px;
     color: var(--text3);
@@ -3666,8 +3674,10 @@ function isTodayTask(t, day) {
   return k === 'do' || k === 'ongoing' || k === 'promise' || k === 'wait';
 }
 function isUpcomingTask(t, today) {
+  if (scheduleMod && scheduleMod.isUpcomingTask) return scheduleMod.isUpcomingTask(t, today);
+  // Past unfinished dated tasks stay on their day in Upcoming — not Backlog.
   if (!t || t.done || !t.scheduledOn) return false;
-  if (t.scheduledOn <= today) return false;
+  if (t.scheduledOn === today) return false;
   const k = normalizeKind(t.kind);
   return k === 'do' || k === 'ongoing' || k === 'promise' || k === 'wait';
 }
@@ -3690,15 +3700,19 @@ function upcomingDayHeading(ymd, today) {
   if (!d) return { dayNum: '', name: ymd };
   const dayNum = String(d.getDate());
   const tomorrow = addDaysYmdLocal(today, 1);
-  const name = ymd === tomorrow ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'long' });
+  let name;
+  if (ymd < today) name = 'Past';
+  else if (ymd === tomorrow) name = 'Tomorrow';
+  else name = d.toLocaleDateString('en-US', { weekday: 'long' });
   return { dayNum, name };
 }
 function buildUpcomingDaysLocal(today, scheduledYmds) {
   if (scheduleMod && scheduleMod.buildUpcomingDateRange) {
     return scheduleMod.buildUpcomingDateRange(today, scheduledYmds);
   }
+  const past = [...new Set((scheduledYmds || []).filter((y) => y && y < today))].sort();
   const start = addDaysYmdLocal(today, 1);
-  if (!start) return [];
+  if (!start) return past;
   let last = addDaysYmdLocal(start, 13);
   for (const y of scheduledYmds) {
     if (y && y > today && (!last || y > last)) last = y;
@@ -3710,7 +3724,7 @@ function buildUpcomingDaysLocal(today, scheduledYmds) {
     out.push(cur);
     cur = addDaysYmdLocal(cur, 1);
   }
-  return out;
+  return past.concat(out);
 }
 function syncUpcomingPriorityChips() {
   const wrap = document.getElementById('upcoming-prio-chips');
@@ -3733,13 +3747,11 @@ function taskMatchesUpcomingFilters(t) {
   return true;
 }
 function isBacklogOpenTask(t, day) {
+  if (scheduleMod && scheduleMod.isBacklogOpenTask) return scheduleMod.isBacklogOpenTask(t);
+  // Backlog = undated only; day arg kept for callers.
+  void day;
   if (!t || t.done) return false;
-  if (isUpcomingTask(t, day)) return false;
-  const k = normalizeKind(t.kind);
-  if (k === 'park') return true;
-  if (!t.scheduledOn) return true;
-  if (t.scheduledOn !== day) return true;
-  return false;
+  return !t.scheduledOn;
 }
 function tabForTask(t) {
   if (!t) return 'tasks';
@@ -5637,12 +5649,19 @@ function reorderMilestoneRelativeTo(scope, pid, movedMid, overMid, placeBefore) 
   }
 }
 
+function isPastLeftoverTask(t, today) {
+  return !!(t && !t.done && t.scheduledOn && today && t.scheduledOn < today);
+}
 function taskItemHTML(t, opts) {
   const exp = !!expandedTasks[t.id];
   const doneLbl = t.done ? 'Mark as not done' : 'Mark complete';
   const sec = t.done ? 'done' : 'open';
   const whenAttr = t.scheduledOn ? ` data-scheduled-on="${esc(t.scheduledOn)}"` : '';
-  return `<div class="task-item-figma" id="planner-task-${t.id}" style="view-transition-name: vt-task-${t.id}" data-task-section="${sec}"${whenAttr}
+  const pastLeftover = isPastLeftoverTask(t, todayYmdLocal());
+  const pastPill = pastLeftover
+    ? '<span class="past-leftover-pill" aria-label="Past leftover">Past</span>'
+    : '';
+  return `<div class="task-item-figma${pastLeftover ? ' is-past-leftover' : ''}" id="planner-task-${t.id}" style="view-transition-name: vt-task-${t.id}" data-task-section="${sec}"${whenAttr}
     ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,'${t.id}')">
     <span class="task-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder, change Today section, or move between days" title="Drag to reorder, change Today section, or move between days"
       ondragstart="taskDragStart(event,'${t.id}')" ondragend="taskDragEnd(event)" onclick="event.stopPropagation()">${taskDragHandleSVG()}</span>
@@ -5653,7 +5672,7 @@ function taskItemHTML(t, opts) {
         <div class="task-row-line1">
           <div class="task-row-summary-textrow">
             <div class="goal-title task-row-title task-title-editable ${t.done ? 'done' : ''}" ondblclick="onTaskTitleDblClick('${t.id}',event)" title="Double-click to expand">${esc(t.text)}</div>
-            <span class="task-row-pills">${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}${taskSummaryTypePill(t.cat)}</span>
+            <span class="task-row-pills">${pastPill}${taskSummaryKindPill(t.kind)}${taskSummaryPriorityPill(t.priority)}${taskSummaryTypePill(t.cat)}</span>
           </div>
         </div>
         ${taskTodayMetaLine(t)}
@@ -6005,7 +6024,8 @@ function renderUpcoming() {
     for (const ymd of days) {
       const { dayNum, name } = upcomingDayHeading(ymd, today);
       const items = (byDay[ymd] || []).filter(taskMatchesUpcomingFilters);
-      parts.push(`<section class="upcoming-day" aria-label="${esc(ymd)}" data-drop-day="${esc(ymd)}"
+      const pastCls = ymd < today ? ' is-past' : '';
+      parts.push(`<section class="upcoming-day${pastCls}" aria-label="${esc(ymd)}" data-drop-day="${esc(ymd)}"
         ondragover="upcomingDayDragOver(event)" ondragleave="upcomingDayDragLeave(event)" ondrop="upcomingDayDrop(event,'${esc(ymd)}')">
         <div class="upcoming-day-head"><span class="upcoming-day-num">${esc(dayNum)}</span><span class="upcoming-day-name">${esc(name)}</span></div>`);
       if (!items.length) {
