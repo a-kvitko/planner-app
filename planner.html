@@ -4376,11 +4376,14 @@ function taskTodayMetaLine(t) {
   if (!bits.length) return '';
   return `<div class="today-meta-line">${esc(bits.join(' · '))}</div>`;
 }
-function taskDayToolbarHTML(t) {
+function taskDayToolbarHTML(t, opts) {
   const k = normalizeKind(t.kind);
   const when = displayTaskWhen(t);
-  // Today panel only lists today-scheduled tasks — shortcut drafts tomorrow (applied on Save).
-  const quickBtn = isPanelActive('today')
+  const day = todayYmdLocal();
+  // Today-list cards pass todayPanel; also when When is already today (draft-aware).
+  // Do not use isPanelActive — refreshTaskLists can rebuild this HTML while another tab is active.
+  const showTomorrow = !!(opts && opts.todayPanel) || when === day;
+  const quickBtn = showTomorrow
     ? `<button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', addDaysYmdLocal(todayYmdLocal(), 1))">Tomorrow</button>`
     : `<button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', todayYmdLocal())">Today</button>`;
   return `<div class="task-day-toolbar" onclick="event.stopPropagation()">
@@ -5115,7 +5118,7 @@ function taskComposerHTML() {
   </div>`, 'cancelTaskComposer()');
 }
 
-function taskExpandedBodyHTML(t) {
+function taskExpandedBodyHTML(t, opts) {
   const ms = t.milestones || [];
   const p = normalizeTaskPriority(t.priority);
   const showNested = taskSubtaskComposerFor === t.id;
@@ -5147,7 +5150,7 @@ function taskExpandedBodyHTML(t) {
         ${taskPriorityDropdownHTML(t.id, p)}
         <div class="task-edit-toolbar-cats">${taskCatPillsHTML(t.id, t.cat)}</div>
       </div>
-      ${taskDayToolbarHTML(t)}
+      ${taskDayToolbarHTML(t, opts)}
       <div class="task-tags-block" onclick="event.stopPropagation()">
         <div class="task-tags-label">Tags</div>
         ${taskTagsPickerHTML(t.id)}
@@ -5634,7 +5637,7 @@ function reorderMilestoneRelativeTo(scope, pid, movedMid, overMid, placeBefore) 
   }
 }
 
-function taskItemHTML(t) {
+function taskItemHTML(t, opts) {
   const exp = !!expandedTasks[t.id];
   const doneLbl = t.done ? 'Mark as not done' : 'Mark complete';
   const sec = t.done ? 'done' : 'open';
@@ -5657,7 +5660,7 @@ function taskItemHTML(t) {
       </div>
     </div>
     <div class="card-expanded task-expanded-under new-task-card task-expanded-card ${exp ? 'open' : ''}">
-      ${taskExpandedBodyHTML(t)}
+      ${taskExpandedBodyHTML(t, opts)}
     </div>
     </div>
   </div>`;
@@ -5923,12 +5926,13 @@ function renderToday() {
       ` · Wait checks <strong>${waits.length}</strong>/${maxWait}`;
   }
   const parts = [];
+  const todayOpts = { todayPanel: true };
   const section = (title, items, cls, kind) => {
     parts.push(`<div class="today-kind-section ${cls || ''}" data-today-kind="${kind}"
       ondragover="todayKindDragOver(event)" ondragleave="todayKindDragLeave(event)" ondrop="todayKindDrop(event,'${kind}')">
       <div class="task-section-head">${title} (${items.length})</div>`);
     if (!items.length) parts.push('<div class="task-list-empty-hint">None</div>');
-    else parts.push(items.map(taskItemHTML).join(''));
+    else parts.push(items.map(t => taskItemHTML(t, todayOpts)).join(''));
     parts.push('</div>');
   };
   section('Ongoing', ongoings, 'today-section-ongoing', 'ongoing');
