@@ -81,7 +81,7 @@
       "progress": 33,
       "ts": 1792051702033,
       "kind": "ongoing",
-      "scheduledOn": "2026-10-15",
+      "scheduledOn": "2026-10-16",
       "waitingOn": null,
       "promisedTo": null,
       "nextCheckAt": null,
@@ -1226,7 +1226,7 @@
       "progress": 0,
       "ts": 1791459601467,
       "kind": "do",
-      "scheduledOn": "2026-10-15",
+      "scheduledOn": "2026-10-16",
       "waitingOn": null,
       "promisedTo": null,
       "nextCheckAt": null,
@@ -1463,7 +1463,7 @@
       "progress": 0,
       "ts": 1792051425895,
       "kind": "promise",
-      "scheduledOn": "2026-10-15",
+      "scheduledOn": "2026-10-16",
       "waitingOn": null,
       "promisedTo": "Mimi",
       "nextCheckAt": null,
@@ -2346,5 +2346,5 @@
     "dayOverrides": {}
   },
   "schemaVersion": 2,
-  "updatedAt": "2026-10-15T15:43:45.309Z"
+  "updatedAt": "2026-10-15T20:41:09.304Z"
 }
