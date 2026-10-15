@@ -404,7 +404,8 @@
   #panel-journal.journal-panel-figma {
     overflow-x: clip;
   }
-  .upcoming-day { margin: 8px 0 20px; }
+  .upcoming-day { margin: 8px 0 20px; border-radius: var(--radius); transition: background .12s; }
+  .upcoming-day.upcoming-day-drop-hover { background: color-mix(in srgb, var(--blue) 8%, transparent); }
   .upcoming-day-head {
     display: flex;
     align-items: baseline;
@@ -425,7 +426,16 @@
     font-weight: 600;
     color: var(--text);
   }
-  .upcoming-day-empty { font-size: 13px; color: var(--text3); padding: 4px 0 8px; }
+  .upcoming-day-empty {
+    font-size: 13px;
+    color: var(--text3);
+    padding: 4px 0 8px;
+    min-height: 36px;
+    border-radius: var(--radius);
+  }
+  .upcoming-day-empty.upcoming-day-drop-hover {
+    box-shadow: inset 0 0 0 2px var(--blue);
+  }
   #panel-tasks .stats-row.tasks-stats-figma,
   #panel-logbook .stats-row.tasks-stats-figma,
   #panel-goals .stats-row.goals-stats-figma,
@@ -554,6 +564,14 @@
   .today-composer-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
   .today-section-wait .task-section-head { opacity: 0.85; }
   .today-section-wait .task-item-figma { opacity: 0.88; }
+  .today-kind-section.today-kind-drop-hover {
+    background: color-mix(in srgb, var(--blue) 8%, transparent);
+    border-radius: 8px;
+  }
+  .today-kind-section.today-kind-drop-hover > .task-list-empty-hint {
+    box-shadow: inset 0 0 0 2px var(--blue);
+    border-radius: 8px;
+  }
   .kind-pill { text-transform: capitalize; }
   .kind-pill-wait { opacity: 0.75; }
   .today-meta-line { font-size: 12px; color: var(--text3); margin-top: 2px; }
@@ -1854,6 +1872,8 @@ let pendingFocusNestedSubtaskTid = null;
 let pendingFocusNestedSubgoalGid = null;
 let pendingFocusJournalEntryId = null;
 let pendingFocusTaskComposer = false;
+/** Staged When/Today/Backlog per task id; applied only on Save. Missing key = no draft. @type {Record<string, string|null>} */
+let taskScheduleDrafts = {};
 
 /** Wrap a creation card in a dimmed full-screen modal shell. */
 function composerModalHTML(cardHtml, cancelFnCall) {
@@ -1936,6 +1956,7 @@ function collapseExpandedTasksExcept(keepId) {
     if (tid === keepId) continue;
     if (!expandedTasks[tid]) continue;
     flushTaskCardFields(tid);
+    clearTaskScheduleDraft(tid);
     expandedTasks[tid] = false;
     if (taskSubtaskComposerFor === tid) {
       taskSubtaskComposerFor = null;
@@ -1983,6 +2004,7 @@ function dismissOpenExpandedCards() {
   for (const tid of Object.keys(expandedTasks)) {
     if (!expandedTasks[tid]) continue;
     flushTaskCardFields(tid);
+    clearTaskScheduleDraft(tid);
     delete taskEditSnapshots[tid];
     expandedTasks[tid] = false;
     tasks = true;
@@ -2162,8 +2184,10 @@ function onTaskRowClick(id, e) {
   const wasExpanded = !!expandedTasks[id];
   if (e.target.closest('.task-row-title')) {
     armCardExpandToggle(key, () => {
-      if (wasExpanded) flushTaskCardFields(id);
-      else collapseExpandedTasksExcept(id);
+      if (wasExpanded) {
+        flushTaskCardFields(id);
+        clearTaskScheduleDraft(id);
+      } else collapseExpandedTasksExcept(id);
       expandedTasks[id] = !expandedTasks[id];
       if (expandedTasks[id] && !wasExpanded) {
         captureTaskEditSnapshot(id);
@@ -2175,8 +2199,10 @@ function onTaskRowClick(id, e) {
     return;
   }
   cancelCardExpandToggle(key);
-  if (wasExpanded) flushTaskCardFields(id);
-  else collapseExpandedTasksExcept(id);
+  if (wasExpanded) {
+    flushTaskCardFields(id);
+    clearTaskScheduleDraft(id);
+  } else collapseExpandedTasksExcept(id);
   expandedTasks[id] = !expandedTasks[id];
   if (expandedTasks[id] && !wasExpanded) {
     captureTaskEditSnapshot(id);
@@ -3398,40 +3424,90 @@ function delTask(id) {
   delete openTaskTabs[id];
   delete expandedTasks[id];
   delete taskEditSnapshots[id];
+  clearTaskScheduleDraft(id);
   if (taskSubtaskComposerFor === id) { taskSubtaskComposerFor = null; clearNestedComposerDraft(); }
   save(); refreshTaskLists();
+}
+/** Mutate kind; wait defaults to P3 (same as Kind select). */
+function applyTaskKindMutate(t, kind) {
+  if (!t || t.done) return false;
+  const next = normalizeKind(kind);
+  if (!TASK_KINDS.includes(next)) return false;
+  t.kind = next;
+  if (next === 'wait') t.priority = 'p3';
+  return true;
 }
 function setTaskKind(id, kind) {
   const t = data.tasks.find(x => x.id === id);
   if (!t) return;
   flushTaskCardFields(id);
-  const next = normalizeKind(kind);
-  t.kind = next;
-  if (next === 'wait') t.priority = 'p3';
+  if (!applyTaskKindMutate(t, kind)) return;
   save();
   refreshTaskLists();
 }
-function scheduleTask(id, ymd) {
+function schedulePassesCapacity(t, snapped) {
+  const nextKind = t.kind === 'park' && snapped ? 'do' : normalizeKind(t.kind);
+  if (!snapped || (nextKind !== 'do' && nextKind !== 'promise')) return true;
+  const cap = computeCapacityFor(snapped);
+  if (!cap) return true;
+  const already = t.scheduledOn === snapped && (t.kind === 'do' || t.kind === 'promise');
+  if (already) return true;
+  const est = Number(t.timeEstimateMin);
+  const addMin = Number.isFinite(est) && est >= 0
+    ? est
+    : ((data.settings && data.settings.defaultEstimateMin) || 45);
+  return confirmCapacityOverload(cap, cap.doCount + 1, cap.plannedDoMinutes + addMin);
+}
+function clearTaskScheduleDraft(id) {
+  delete taskScheduleDrafts[id];
+}
+function displayTaskWhen(t) {
+  if (!t) return '';
+  if (Object.prototype.hasOwnProperty.call(taskScheduleDrafts, t.id)) {
+    return taskScheduleDrafts[t.id] || '';
+  }
+  return t.scheduledOn || '';
+}
+/** Stage When/Today/Backlog in the edit card; applied on Save only. */
+function draftTaskSchedule(id, ymd) {
+  const snapped = ymd ? snapWorkday(ymd) : null;
+  taskScheduleDrafts[id] = snapped;
+  const el = document.getElementById('task-when-' + id);
+  if (el) el.value = snapped || '';
+}
+/** @returns {boolean} false if capacity confirm cancelled (draft kept). */
+function applyTaskScheduleDraft(id) {
+  if (!Object.prototype.hasOwnProperty.call(taskScheduleDrafts, id)) return true;
+  const t = data.tasks.find(x => x.id === id);
+  const snapped = taskScheduleDrafts[id];
+  if (!t) {
+    clearTaskScheduleDraft(id);
+    return true;
+  }
+  if (snapped == null) {
+    t.scheduledOn = null;
+    if (t.kind !== 'wait' && t.kind !== 'promise') t.kind = 'park';
+    clearTaskScheduleDraft(id);
+    return true;
+  }
+  if (!schedulePassesCapacity(t, snapped)) return false;
+  t.scheduledOn = snapped;
+  if (t.kind === 'park') t.kind = 'do';
+  clearTaskScheduleDraft(id);
+  return true;
+}
+function scheduleTask(id, ymd, opts) {
   const t = data.tasks.find(x => x.id === id);
   if (!t) return;
   flushTaskCardFields(id);
   const snapped = ymd ? snapWorkday(ymd) : null;
-  const nextKind = t.kind === 'park' && snapped ? 'do' : normalizeKind(t.kind);
-  if (snapped && (nextKind === 'do' || nextKind === 'promise')) {
-    const cap = computeCapacityFor(snapped);
-    if (cap) {
-      const already = t.scheduledOn === snapped && (t.kind === 'do' || t.kind === 'promise');
-      if (!already) {
-        const est = Number(t.timeEstimateMin);
-        const addMin = Number.isFinite(est) && est >= 0
-          ? est
-          : ((data.settings && data.settings.defaultEstimateMin) || 45);
-        if (!confirmCapacityOverload(cap, cap.doCount + 1, cap.plannedDoMinutes + addMin)) return;
-      }
-    }
-  }
+  const becomesDo = t.kind === 'park' && !!snapped;
+  if (t.scheduledOn === snapped && !becomesDo) return;
+  if (!schedulePassesCapacity(t, snapped)) return;
+  if (opts && opts.bumpRollover) bumpRollover(t);
   t.scheduledOn = snapped;
   if (t.kind === 'park' && snapped) t.kind = 'do';
+  clearTaskScheduleDraft(id);
   save();
   refreshTaskLists();
 }
@@ -3441,6 +3517,7 @@ function moveTaskToBacklog(id) {
   flushTaskCardFields(id);
   t.scheduledOn = null;
   if (t.kind !== 'wait' && t.kind !== 'promise') t.kind = 'park';
+  clearTaskScheduleDraft(id);
   save();
   refreshTaskLists();
 }
@@ -3495,14 +3572,8 @@ function bumpRollover(t) {
   t.rolloverCount = (typeof t.rolloverCount === 'number' ? t.rolloverCount : 0) + 1;
 }
 function eveningReschedule(id, ymd) {
-  const t = data.tasks.find(x => x.id === id);
-  if (!t) return;
-  const snapped = ymd ? snapWorkday(ymd) : null;
-  if (!snapped) return;
-  bumpRollover(t);
-  t.scheduledOn = snapped;
-  save();
-  refreshTaskLists();
+  if (!ymd) return;
+  scheduleTask(id, ymd, { bumpRollover: true });
 }
 function eveningBacklog(id) {
   const t = data.tasks.find(x => x.id === id);
@@ -3510,6 +3581,7 @@ function eveningBacklog(id) {
   bumpRollover(t);
   t.scheduledOn = null;
   if (t.kind !== 'wait' && t.kind !== 'promise') t.kind = 'park';
+  clearTaskScheduleDraft(id);
   save();
   refreshTaskLists();
 }
@@ -3729,6 +3801,7 @@ function cancelTaskCardEdit(tid) {
     } catch (e) {}
     delete taskEditSnapshots[tid];
   }
+  clearTaskScheduleDraft(tid);
   expandedTasks[tid] = false;
   taskSubtaskComposerFor = null;
   clearNestedComposerDraft();
@@ -3738,6 +3811,7 @@ function cancelTaskCardEdit(tid) {
 function saveTaskCardEdit(tid) {
   flushTaskCardFields(tid);
   saveTaskDescription(tid);
+  if (!applyTaskScheduleDraft(tid)) return;
   delete taskEditSnapshots[tid];
   expandedTasks[tid] = false;
   taskSubtaskComposerFor = null;
@@ -4304,14 +4378,14 @@ function taskTodayMetaLine(t) {
 }
 function taskDayToolbarHTML(t) {
   const k = normalizeKind(t.kind);
-  const when = t.scheduledOn || '';
+  const when = displayTaskWhen(t);
   return `<div class="task-day-toolbar" onclick="event.stopPropagation()">
     <label>Kind <select aria-label="Kind" onchange="setTaskKind('${t.id}', this.value)">
       ${TASK_KINDS.map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${x}</option>`).join('')}
     </select></label>
-    <label>When <input type="date" aria-label="Schedule date" value="${esc(when)}" onchange="scheduleTask('${t.id}', this.value)"></label>
-    <button type="button" class="btn btn--outline btn--dense" onclick="scheduleTaskToday('${t.id}')">Today</button>
-    <button type="button" class="btn btn--outline btn--dense" onclick="moveTaskToBacklog('${t.id}')">Backlog</button>
+    <label>When <input type="date" id="task-when-${t.id}" aria-label="Schedule date" value="${esc(when)}" onchange="draftTaskSchedule('${t.id}', this.value)"></label>
+    <button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', todayYmdLocal())">Today</button>
+    <button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', null)">Backlog</button>
     ${k === 'wait' ? `<input type="text" placeholder="Waiting on…" value="${esc(t.waitingOn || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.waitingOn=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
     ${k === 'promise' ? `<input type="text" placeholder="Promised to…" value="${esc(t.promisedTo || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.promisedTo=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
   </div>`;
@@ -5104,7 +5178,63 @@ function taskDragEnd() {
   document.querySelectorAll('.task-item-figma.task-drop-before, .task-item-figma.task-drop-after').forEach(el => {
     el.classList.remove('task-drop-before', 'task-drop-after');
   });
+  document.querySelectorAll('.upcoming-day-drop-hover').forEach(el => el.classList.remove('upcoming-day-drop-hover'));
+  document.querySelectorAll('.today-kind-drop-hover').forEach(el => el.classList.remove('today-kind-drop-hover'));
   taskDndSourceId = null;
+}
+
+function clearTodayKindDropHover(except) {
+  document.querySelectorAll('.today-kind-drop-hover').forEach(x => {
+    if (x !== except) x.classList.remove('today-kind-drop-hover');
+  });
+}
+
+function todayKindFromEl(el) {
+  const sec = el && el.closest && el.closest('[data-today-kind]');
+  return sec ? normalizeKind(sec.dataset.todayKind) : null;
+}
+
+function todayKindDragOver(ev) {
+  ev.preventDefault();
+  if (!taskDndSourceId) return;
+  if (ev.target.closest('.task-item-figma')) {
+    ev.currentTarget.classList.remove('today-kind-drop-hover');
+    return;
+  }
+  ev.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.task-item-figma.task-drop-before, .task-item-figma.task-drop-after').forEach(el => {
+    el.classList.remove('task-drop-before', 'task-drop-after');
+  });
+  clearTodayKindDropHover(ev.currentTarget);
+  ev.currentTarget.classList.add('today-kind-drop-hover');
+}
+
+function todayKindDragLeave(ev) {
+  const el = ev.currentTarget;
+  const rel = ev.relatedTarget;
+  if (rel && el.contains(rel)) return;
+  el.classList.remove('today-kind-drop-hover');
+}
+
+function todayKindDrop(ev, kind) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  if (ev.target.closest('.task-item-figma')) return;
+  const el = ev.currentTarget;
+  el.classList.remove('today-kind-drop-hover');
+  const movedId = taskDndSourceId || ev.dataTransfer.getData('text/plain');
+  const t = movedId ? data.tasks.find(x => x.id === movedId) : null;
+  if (!t || t.done || normalizeKind(t.kind) === normalizeKind(kind)) {
+    taskDragEnd();
+    return;
+  }
+  if (!applyTaskKindMutate(t, kind)) {
+    taskDragEnd();
+    return;
+  }
+  taskDndSourceId = null;
+  save();
+  refreshTaskLists();
 }
 
 function taskDragOver(ev) {
@@ -5114,6 +5244,8 @@ function taskDragOver(ev) {
   const el = ev.currentTarget;
   const src = document.getElementById('planner-task-' + taskDndSourceId);
   if (!src || src.dataset.taskSection !== el.dataset.taskSection) return;
+  document.querySelectorAll('.upcoming-day-drop-hover').forEach(x => x.classList.remove('upcoming-day-drop-hover'));
+  clearTodayKindDropHover();
   document.querySelectorAll('.task-item-figma').forEach(x => {
     if (x !== el) x.classList.remove('task-drop-before', 'task-drop-after');
   });
@@ -5130,6 +5262,74 @@ function taskDragLeave(ev) {
   el.classList.remove('task-drop-before', 'task-drop-after');
 }
 
+/** Set scheduledOn for DnD; returns false if capacity confirm cancelled. */
+function assignTaskDayForDnD(t, ymd) {
+  if (!t || t.done) return false;
+  const snapped = ymd ? snapWorkday(ymd) : null;
+  if (!snapped) return false;
+  if (t.scheduledOn === snapped) return true;
+  const nextKind = t.kind === 'park' && snapped ? 'do' : normalizeKind(t.kind);
+  if (nextKind === 'do' || nextKind === 'promise') {
+    const cap = computeCapacityFor(snapped);
+    if (cap) {
+      const est = Number(t.timeEstimateMin);
+      const addMin = Number.isFinite(est) && est >= 0
+        ? est
+        : ((data.settings && data.settings.defaultEstimateMin) || 45);
+      if (!confirmCapacityOverload(cap, cap.doCount + 1, cap.plannedDoMinutes + addMin)) return false;
+    }
+  }
+  t.scheduledOn = snapped;
+  if (t.kind === 'park' && snapped) t.kind = 'do';
+  return true;
+}
+
+function upcomingDayDragOver(ev) {
+  ev.preventDefault();
+  if (!taskDndSourceId) return;
+  if (ev.target.closest('.task-item-figma')) {
+    ev.currentTarget.classList.remove('upcoming-day-drop-hover');
+    return;
+  }
+  ev.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.task-item-figma.task-drop-before, .task-item-figma.task-drop-after').forEach(el => {
+    el.classList.remove('task-drop-before', 'task-drop-after');
+  });
+  document.querySelectorAll('.upcoming-day-drop-hover').forEach(x => {
+    if (x !== ev.currentTarget) x.classList.remove('upcoming-day-drop-hover');
+  });
+  ev.currentTarget.classList.add('upcoming-day-drop-hover');
+}
+
+function upcomingDayDragLeave(ev) {
+  const el = ev.currentTarget;
+  const rel = ev.relatedTarget;
+  if (rel && el.contains(rel)) return;
+  el.classList.remove('upcoming-day-drop-hover');
+}
+
+function upcomingDayDrop(ev, ymd) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  if (ev.target.closest('.task-item-figma')) return;
+  const el = ev.currentTarget;
+  el.classList.remove('upcoming-day-drop-hover');
+  const movedId = taskDndSourceId || ev.dataTransfer.getData('text/plain');
+  const t = movedId ? data.tasks.find(x => x.id === movedId) : null;
+  if (!t || t.done) {
+    taskDragEnd();
+    return;
+  }
+  const prev = t.scheduledOn;
+  if (!assignTaskDayForDnD(t, ymd) || t.scheduledOn === prev) {
+    taskDragEnd();
+    return;
+  }
+  taskDndSourceId = null;
+  save();
+  refreshTaskLists();
+}
+
 function taskDrop(ev, id) {
   ev.preventDefault();
   ev.stopPropagation();
@@ -5140,6 +5340,21 @@ function taskDrop(ev, id) {
   if (!movedId || !srcEl || srcEl.dataset.taskSection !== el.dataset.taskSection || movedId === id) {
     taskDragEnd();
     return;
+  }
+  const moved = data.tasks.find(x => x.id === movedId);
+  const targetDay = el.dataset.scheduledOn || '';
+  if (moved && targetDay && moved.scheduledOn !== targetDay) {
+    if (!assignTaskDayForDnD(moved, targetDay)) {
+      taskDragEnd();
+      return;
+    }
+  }
+  const dropKind = todayKindFromEl(el);
+  if (moved && dropKind && normalizeKind(moved.kind) !== dropKind) {
+    if (!applyTaskKindMutate(moved, dropKind)) {
+      taskDragEnd();
+      return;
+    }
   }
   const rect = el.getBoundingClientRect();
   const placeBefore = ev.clientY < rect.top + rect.height / 2;
@@ -5419,9 +5634,10 @@ function taskItemHTML(t) {
   const exp = !!expandedTasks[t.id];
   const doneLbl = t.done ? 'Mark as not done' : 'Mark complete';
   const sec = t.done ? 'done' : 'open';
-  return `<div class="task-item-figma" id="planner-task-${t.id}" style="view-transition-name: vt-task-${t.id}" data-task-section="${sec}"
+  const whenAttr = t.scheduledOn ? ` data-scheduled-on="${esc(t.scheduledOn)}"` : '';
+  return `<div class="task-item-figma" id="planner-task-${t.id}" style="view-transition-name: vt-task-${t.id}" data-task-section="${sec}"${whenAttr}
     ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,'${t.id}')">
-    <span class="task-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder" title="Drag to reorder"
+    <span class="task-drag-handle" draggable="true" role="button" tabindex="0" aria-label="Drag to reorder, change Today section, or move between days" title="Drag to reorder, change Today section, or move between days"
       ondragstart="taskDragStart(event,'${t.id}')" ondragend="taskDragEnd(event)" onclick="event.stopPropagation()">${taskDragHandleSVG()}</span>
     <div class="task-item-figma-body">
     <div class="task-row-figma ${exp ? 'is-expanded' : ''}" onclick="onTaskRowClick('${t.id}',event)">
@@ -5703,16 +5919,18 @@ function renderToday() {
       ` · Wait checks <strong>${waits.length}</strong>/${maxWait}`;
   }
   const parts = [];
-  const section = (title, items, cls) => {
-    parts.push(`<div class="${cls || ''}"><div class="task-section-head">${title} (${items.length})</div>`);
+  const section = (title, items, cls, kind) => {
+    parts.push(`<div class="today-kind-section ${cls || ''}" data-today-kind="${kind}"
+      ondragover="todayKindDragOver(event)" ondragleave="todayKindDragLeave(event)" ondrop="todayKindDrop(event,'${kind}')">
+      <div class="task-section-head">${title} (${items.length})</div>`);
     if (!items.length) parts.push('<div class="task-list-empty-hint">None</div>');
     else parts.push(items.map(taskItemHTML).join(''));
     parts.push('</div>');
   };
-  section('Ongoing', ongoings, 'today-section-ongoing');
-  section('Do', dos, 'today-section-do');
-  section('Promise', promises, 'today-section-promise');
-  section('Wait', waits, 'today-section-wait');
+  section('Ongoing', ongoings, 'today-section-ongoing', 'ongoing');
+  section('Do', dos, 'today-section-do', 'do');
+  section('Promise', promises, 'today-section-promise', 'promise');
+  section('Wait', waits, 'today-section-wait', 'wait');
   parts.push('<div class="task-section-head" style="margin-top:20px">Not on Today</div>');
   parts.push('<div class="task-list-empty-hint"><button type="button" class="btn btn-sm btn--ghost" onclick="switchTab(\'tasks\')">Open backlog (Tasks)</button></div>');
   if (isPanelActive('today')) {
@@ -5779,10 +5997,15 @@ function renderUpcoming() {
     for (const ymd of days) {
       const { dayNum, name } = upcomingDayHeading(ymd, today);
       const items = (byDay[ymd] || []).filter(taskMatchesUpcomingFilters);
-      parts.push(`<section class="upcoming-day" aria-label="${esc(ymd)}">
+      parts.push(`<section class="upcoming-day" aria-label="${esc(ymd)}" data-drop-day="${esc(ymd)}"
+        ondragover="upcomingDayDragOver(event)" ondragleave="upcomingDayDragLeave(event)" ondrop="upcomingDayDrop(event,'${esc(ymd)}')">
         <div class="upcoming-day-head"><span class="upcoming-day-num">${esc(dayNum)}</span><span class="upcoming-day-name">${esc(name)}</span></div>`);
-      if (!items.length) parts.push('<div class="upcoming-day-empty"></div>');
-      else parts.push(items.map(taskItemHTML).join(''));
+      if (!items.length) {
+        parts.push(`<div class="upcoming-day-empty" data-drop-day="${esc(ymd)}"
+          ondragover="upcomingDayDragOver(event)" ondragleave="upcomingDayDragLeave(event)" ondrop="upcomingDayDrop(event,'${esc(ymd)}')"></div>`);
+      } else {
+        parts.push(items.map(taskItemHTML).join(''));
+      }
       parts.push('</section>');
     }
   }
