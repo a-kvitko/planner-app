@@ -4379,12 +4379,16 @@ function taskTodayMetaLine(t) {
 function taskDayToolbarHTML(t) {
   const k = normalizeKind(t.kind);
   const when = displayTaskWhen(t);
+  // Today panel only lists today-scheduled tasks — shortcut drafts tomorrow (applied on Save).
+  const quickBtn = isPanelActive('today')
+    ? `<button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', addDaysYmdLocal(todayYmdLocal(), 1))">Tomorrow</button>`
+    : `<button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', todayYmdLocal())">Today</button>`;
   return `<div class="task-day-toolbar" onclick="event.stopPropagation()">
     <label>Kind <select aria-label="Kind" onchange="setTaskKind('${t.id}', this.value)">
       ${TASK_KINDS.map(x => `<option value="${x}" ${x === k ? 'selected' : ''}>${x}</option>`).join('')}
     </select></label>
     <label>When <input type="date" id="task-when-${t.id}" aria-label="Schedule date" value="${esc(when)}" onchange="draftTaskSchedule('${t.id}', this.value)"></label>
-    <button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', todayYmdLocal())">Today</button>
+    ${quickBtn}
     <button type="button" class="btn btn--outline btn--dense" onclick="draftTaskSchedule('${t.id}', null)">Backlog</button>
     ${k === 'wait' ? `<input type="text" placeholder="Waiting on…" value="${esc(t.waitingOn || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.waitingOn=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
     ${k === 'promise' ? `<input type="text" placeholder="Promised to…" value="${esc(t.promisedTo || '')}" onchange="(function(el){const x=data.tasks.find(z=>z.id==='${t.id}');if(x){x.promisedTo=el.value.trim()||null;save();refreshTaskLists();}})(this)">` : ''}
