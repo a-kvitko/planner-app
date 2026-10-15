@@ -3594,8 +3594,10 @@ function isTodayTask(t, day) {
   return k === 'do' || k === 'ongoing' || k === 'promise' || k === 'wait';
 }
 function isUpcomingTask(t, today) {
+  if (scheduleMod && scheduleMod.isUpcomingTask) return scheduleMod.isUpcomingTask(t, today);
+  // Past unfinished dated tasks stay on their day in Upcoming — not Backlog.
   if (!t || t.done || !t.scheduledOn) return false;
-  if (t.scheduledOn <= today) return false;
+  if (t.scheduledOn === today) return false;
   const k = normalizeKind(t.kind);
   return k === 'do' || k === 'ongoing' || k === 'promise' || k === 'wait';
 }
@@ -3618,15 +3620,19 @@ function upcomingDayHeading(ymd, today) {
   if (!d) return { dayNum: '', name: ymd };
   const dayNum = String(d.getDate());
   const tomorrow = addDaysYmdLocal(today, 1);
-  const name = ymd === tomorrow ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'long' });
+  let name;
+  if (ymd < today) name = 'Past';
+  else if (ymd === tomorrow) name = 'Tomorrow';
+  else name = d.toLocaleDateString('en-US', { weekday: 'long' });
   return { dayNum, name };
 }
 function buildUpcomingDaysLocal(today, scheduledYmds) {
   if (scheduleMod && scheduleMod.buildUpcomingDateRange) {
     return scheduleMod.buildUpcomingDateRange(today, scheduledYmds);
   }
+  const past = [...new Set((scheduledYmds || []).filter((y) => y && y < today))].sort();
   const start = addDaysYmdLocal(today, 1);
-  if (!start) return [];
+  if (!start) return past;
   let last = addDaysYmdLocal(start, 13);
   for (const y of scheduledYmds) {
     if (y && y > today && (!last || y > last)) last = y;
@@ -3638,7 +3644,7 @@ function buildUpcomingDaysLocal(today, scheduledYmds) {
     out.push(cur);
     cur = addDaysYmdLocal(cur, 1);
   }
-  return out;
+  return past.concat(out);
 }
 function syncUpcomingPriorityChips() {
   const wrap = document.getElementById('upcoming-prio-chips');
@@ -3661,13 +3667,11 @@ function taskMatchesUpcomingFilters(t) {
   return true;
 }
 function isBacklogOpenTask(t, day) {
+  if (scheduleMod && scheduleMod.isBacklogOpenTask) return scheduleMod.isBacklogOpenTask(t);
+  // Backlog = undated only; day arg kept for callers.
+  void day;
   if (!t || t.done) return false;
-  if (isUpcomingTask(t, day)) return false;
-  const k = normalizeKind(t.kind);
-  if (k === 'park') return true;
-  if (!t.scheduledOn) return true;
-  if (t.scheduledOn !== day) return true;
-  return false;
+  return !t.scheduledOn;
 }
 function tabForTask(t) {
   if (!t) return 'tasks';
