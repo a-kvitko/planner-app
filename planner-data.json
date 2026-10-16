@@ -1,107 +1,45 @@
 {
   "tasks": [
     {
-      "id": "mv55gzfx67es",
-      "text": "Lopes [TDWEB-18426] Web - Add a list of recent search requests to the symbol search screen",
-      "description": "- 12.10.2026: discussed with Lopes on the call. Transcript in the work folder. The record in Cursor has been created.",
-      "cat": "work",
-      "priority": "p2",
+      "id": "mvaohpjo6nyj",
+      "text": "DR [TDWEB-18332] Screener - Error 409 on estimate results when Study - Crosses below or Crosses above operator is selected",
+      "description": "- 16.10.2026 — clarification sent to Lopes (+ BA): prefer hide 2nd Period; waiting on reply\nhttps://jira.in.devexperts.com/browse/TDWEB-18332",
+      "cat": "urgent",
+      "priority": "p3",
       "tagIds": [
         "mnrzzd57bino",
-        "mns006zuavff",
-        "mnyawq89hy4y"
+        "mns00n4rgrjt",
+        "mnyawmpwt18t"
       ],
       "done": false,
       "milestones": [],
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1791803383918,
-      "kind": "ongoing",
-      "scheduledOn": "2026-10-16",
-      "waitingOn": null,
-      "promisedTo": "Lopes",
-      "nextCheckAt": null,
-      "deadline": null,
-      "timeEstimateMin": 90,
-      "completedAt": null,
-      "rolloverCount": 0,
-      "project": "TDW",
-      "jiraKey": "TDWEB-18426"
-    },
-    {
-      "id": "mv99baxdjjtf",
-      "text": "Dzhelebov TDBL-4411 — confirmed designers create web+mobile DRs",
-      "description": "- 15.10.2026: the web https://jira.in.devexperts.com/browse/TDWEB-18464\n- 14.10.2026: add the design tasks for https://jira.in.devexperts.com/browse/TDBL-4411",
-      "cat": "work",
-      "priority": "p2",
-      "tagIds": [
-        "mnrzzd57bino",
-        "mnyawq89hy4y",
-        "muvcz2chqkgy"
-      ],
-      "done": false,
-      "milestones": [
-        {
-          "id": "mv9mx4pqhigc",
-          "text": "create iOS ticket",
-          "description": "",
-          "priority": "p3",
-          "cat": "work",
-          "tagIds": [],
-          "done": false,
-          "comments": [],
-          "links": []
-        },
-        {
-          "id": "mv9mxhhtba7w",
-          "text": "create Andriod ticket",
-          "description": "",
-          "priority": "p3",
-          "cat": "work",
-          "tagIds": [],
-          "done": false,
-          "comments": [],
-          "links": []
-        },
-        {
-          "id": "mv9mwvm34303",
-          "text": "create the web ticket",
-          "description": "https://jira.in.devexperts.com/browse/TDWEB-18464",
-          "priority": "p3",
-          "cat": "work",
-          "tagIds": [],
-          "done": true,
-          "comments": [],
-          "links": []
-        }
-      ],
-      "comments": [],
-      "links": [],
-      "progress": 33,
-      "ts": 1792051702033,
-      "kind": "ongoing",
-      "scheduledOn": "2026-10-16",
-      "waitingOn": null,
+      "ts": 1792137661332,
+      "kind": "wait",
+      "scheduledOn": "2026-10-19",
+      "waitingOn": "Lopes",
       "promisedTo": null,
-      "nextCheckAt": null,
+      "nextCheckAt": "2026-10-19",
       "deadline": null,
       "timeEstimateMin": null,
       "completedAt": null,
       "rolloverCount": 0,
       "project": null,
-      "jiraKey": null
+      "jiraKey": "TDWEB-18332"
     },
     {
       "id": "mv49kqf8cp0b",
       "text": "Continue Code connect",
-      "description": "",
+      "description": "#code_connect  some note",
       "cat": "work",
       "priority": "p2",
       "tagIds": [
         "mnyawq89hy4y",
         "mnrzzd57bino",
-        "muvcyvin4j33"
+        "muvcyvin4j33",
+        "mvb0tufgeq9x"
       ],
       "done": false,
       "milestones": [],
@@ -120,6 +58,35 @@
       "rolloverCount": 0,
       "project": null,
       "jiraKey": null
+    },
+    {
+      "id": "mv55gzfx67es",
+      "text": "Lopes [TDWEB-18426] Web - Add a list of recent search requests to the symbol search screen",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-18426\n\n- 12.10.2026: discussed with Lopes on the call. Transcript in the work folder. The record in Cursor has been created.",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mnrzzd57bino",
+        "mns006zuavff",
+        "mnyawsv6pszp"
+      ],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791803383918,
+      "kind": "wait",
+      "scheduledOn": "2026-10-16",
+      "waitingOn": null,
+      "promisedTo": "Lopes",
+      "nextCheckAt": null,
+      "deadline": null,
+      "timeEstimateMin": 90,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": "TDW",
+      "jiraKey": "TDWEB-18426"
     },
     {
       "id": "muva4m0lcayz",
@@ -141,7 +108,7 @@
       "progress": 0,
       "ts": 1791206542965,
       "kind": "wait",
-      "scheduledOn": "2026-10-16",
+      "scheduledOn": "2026-10-19",
       "deadline": null,
       "waitingOn": "Maria",
       "promisedTo": null,
@@ -155,7 +122,7 @@
     {
       "id": "muv1pxlgdcfo",
       "text": "P3 👀 DR Orlova [TDWEB-18342] Client Area - client account is shown for Watchlist",
-      "description": "- 2026-10-06 — Today P1. Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash\n\n- 07.10.2026: No, we cannot remove the second line of the widget header because this is a common layout for all dxTrade headers.\nI see two possible solutions:\n- Simple one — just remove “Account” from the WH.\n- Alternative — replace “Account” with the \"Admin\" name.\nNow: I'm waiting for Orlova's decition",
+      "description": "- 07.10.2026: No, we cannot remove the second line of the widget header because this is a common layout for all dxTrade headers.\nI see two possible solutions:\n- Simple one — just remove “Account” from the WH.\n- Alternative — replace “Account” with the \"Admin\" name.\nNow: I'm waiting for Orlova's decision\n\n- 06.10.2026: Не закончен: UI 2-й строки Watchlist (убрать vs admin/principal). Ответ Orlova/Anderson.\nhttps://jira.in.devexperts.com/browse/TDWEB-18342\nprobably, we need to display an admin's name, rather than a client's or even em-dash",
       "cat": "work",
       "priority": "p4",
       "tagIds": [
@@ -173,7 +140,7 @@
       "progress": 0,
       "ts": 1791192421204,
       "kind": "wait",
-      "scheduledOn": "2026-10-16",
+      "scheduledOn": "2026-10-27",
       "waitingOn": "Orlova",
       "promisedTo": "Orlova",
       "nextCheckAt": "2026-10-08",
@@ -187,7 +154,7 @@
     {
       "id": "muwg5z2ba9vu",
       "text": "P3 👀 Kasperovich + Danny D — Live mode vs global actions UX",
-      "description": "https://jira.in.devexperts.com/browse/TDWADMIN-7811\n- **07.10.2026:** I proposed 2 options. Now I'm waiting for Danny D decition\n- **06.10.2026:** suggested 2 options to Danny D. Waiting for his decition\n- **10.06.2026:** Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).",
+      "description": "https://jira.in.devexperts.com/browse/TDWADMIN-7811\n- 16.10.2026: no updates\n- 07.10.2026: I proposed 2 options. Now I'm waiting for Danny D decision\n- 06.10.2026: suggested 2 options to Danny D. Waiting for his decision\n- 10.06.2026: Slack DM 09:51: QA хочет Live включённым при паузе апдейтов от global action; он сомневается (нет индикации).",
       "cat": "work",
       "priority": "p4",
       "tagIds": [
@@ -203,7 +170,7 @@
       "progress": 0,
       "ts": 1791277150403,
       "kind": "wait",
-      "scheduledOn": "2026-10-15",
+      "scheduledOn": "2026-10-20",
       "deadline": null,
       "waitingOn": "Danny D",
       "promisedTo": "Kasperovich",
@@ -215,34 +182,61 @@
       "jiraKey": null
     },
     {
-      "id": "muuza60bqv7y",
-      "text": "P3 DR Tatiana Chibireva [TDWEB-18172] Risk Profile - Planned position misaligned in Positions table",
-      "description": "2026-10-06 — 2026-10-06 — clarification done in Jira + RN design updated (node 4247-215543). DR left Confirmed with Tanya for impl. RO port → TDWEB-18389.\nhttps://jira.in.devexperts.com/browse/TDWEB-18172\n\n07.10.2026: I double-checked the current implementation, and decided to unify the left and right paddings within these tables, especially in the Position subsection. \nThe updated design: https://www.figma.com/design/aRqxryisyE3ZoXuQmYCTL3/TD-AT-%25F0%259F%258C%2590-RN?node-id=4247-215543&t=maX62VonMrWF4Jpp-11\nSent the ticket back to Tatyana. Will see how it goes.",
+      "id": "muwg5z2beg9p",
+      "text": "👀 Mimi [TDWEB-17680] Order Badges in OE dark contrast a11y",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-17680\n\n- 06.10.2026: Assignee Maria",
       "cat": "work",
-      "priority": "p3",
+      "priority": "p2",
       "tagIds": [
-        "mnyawsv6pszp",
-        "mnrzzd57bino",
-        "mns006zuavff",
-        "mns00n4rgrjt"
+        "mnyawq89hy4y",
+        "mns00fjf6vcu"
       ],
       "done": false,
       "milestones": [],
       "comments": [],
       "links": [],
       "progress": 0,
-      "ts": 1791188326379,
-      "kind": "wait",
-      "scheduledOn": "2026-10-05",
+      "ts": 1791277150403,
+      "kind": "promise",
+      "scheduledOn": "2026-10-20",
+      "deadline": null,
       "waitingOn": null,
-      "promisedTo": null,
+      "promisedTo": "Maria",
+      "nextCheckAt": null,
+      "timeEstimateMin": 45,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": "TDW Backlog",
+      "jiraKey": "TDWEB-17680"
+    },
+    {
+      "id": "mvaw7odlpagp",
+      "text": "Ask QA to create a DR for Highlight match в description in the Symbol Suggest",
+      "description": "-15.10.2026: this defect has been discussed with Lopes. He confirmed that it is a defect.",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mnrzzd57bino",
+        "mnrzzz5deeaw",
+        "mnyawsv6pszp"
+      ],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1792150630185,
+      "kind": "promise",
+      "scheduledOn": null,
+      "waitingOn": null,
+      "promisedTo": "Lopes",
       "nextCheckAt": null,
       "deadline": null,
       "timeEstimateMin": null,
       "completedAt": null,
       "rolloverCount": 0,
       "project": null,
-      "jiraKey": "TDWEB-18172"
+      "jiraKey": null
     },
     {
       "id": "muuxv4shasl5",
@@ -1132,31 +1126,6 @@
       "jiraKey": null
     },
     {
-      "id": "muwg5z2beg9p",
-      "text": "[TDWEB-17680] OE dark contrast a11y",
-      "description": "2026-10-06 — 2026-10-06 — Anytime P2. Assignee Maria; не same-day vs Kasperovich/Glukhov.",
-      "cat": "work",
-      "priority": "p2",
-      "tagIds": [],
-      "done": false,
-      "milestones": [],
-      "comments": [],
-      "links": [],
-      "progress": 0,
-      "ts": 1791277150403,
-      "kind": "promise",
-      "scheduledOn": null,
-      "deadline": null,
-      "waitingOn": null,
-      "promisedTo": "Maria",
-      "nextCheckAt": null,
-      "timeEstimateMin": 45,
-      "completedAt": null,
-      "rolloverCount": 0,
-      "project": "TDW Backlog",
-      "jiraKey": "TDWEB-17680"
-    },
-    {
       "id": "muwvajxyvy2q",
       "text": "Port Risk Profile Planned Position alignment design RN → RO [TDWEB-18389]",
       "description": "2026-10-07 — 2026-10-07 — blocked: wait for devs to confirm unified-paddings approach on TDWEB-18172, then port RN→RO. Do not start yet.",
@@ -1212,12 +1181,15 @@
     {
       "id": "muzgsj7e7sdk",
       "text": "Code connect — talk to Matveev about a process. How to deal with it",
-      "description": "",
+      "description": "- 16.10.2026: asked question in slack: https://devexperts.slack.com/archives/DUAVCHBBJ/p1792158211913179",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
         "mnrzzd57bino",
-        "mnyawsv6pszp"
+        "mnyawsv6pszp",
+        "mnrzzz5deeaw",
+        "mns00416do3r",
+        "mvb0tufgeq9x"
       ],
       "done": false,
       "milestones": [],
@@ -1241,12 +1213,12 @@
       "id": "mv12zepn93p1",
       "text": "👀 DR [TDWEB-17779] Charts drawings — default color CCA (Light)",
       "description": "https://jira.in.devexperts.com/browse/TDWEB-17779\n- 12.10.2026: some of issues have been fixed, but I found a tricky case with Range volume profile drawing. this will require BAs decision. I've sent a ticket to BAs.",
-      "cat": "urgent",
-      "priority": "p3",
+      "cat": "work",
+      "priority": "p4",
       "tagIds": [
         "mnrzzd57bino",
         "mns006zuavff",
-        "mnyawsv6pszp"
+        "mnyawv54zt29"
       ],
       "done": false,
       "milestones": [],
@@ -1255,7 +1227,7 @@
       "progress": 0,
       "ts": 1791557339963,
       "kind": "wait",
-      "scheduledOn": "2026-10-13",
+      "scheduledOn": "2026-10-20",
       "deadline": null,
       "waitingOn": "BA",
       "promisedTo": null,
@@ -1268,15 +1240,14 @@
     },
     {
       "id": "mv12zepqiuzl",
-      "text": "👀 [TDWEB-17824] Charts drawings — default color CCA (Dark)",
+      "text": "DR [TDWEB-17824] Charts drawings — default color CCA (Dark)",
       "description": "https://jira.in.devexperts.com/browse/TDWEB-17824\n\n- 12.10.2026: turns out this is the same issue with range volume drawing as in https://jira.in.devexperts.com/browse/TDWEB-17779. Will wait for BAs decision",
       "cat": "work",
-      "priority": "p3",
+      "priority": "p4",
       "tagIds": [
         "mnrzzd57bino",
-        "mnyawq89hy4y",
         "mns006zuavff",
-        "mnyawsv6pszp"
+        "mnyawv54zt29"
       ],
       "done": false,
       "milestones": [],
@@ -1285,7 +1256,7 @@
       "progress": 0,
       "ts": 1791557339966,
       "kind": "wait",
-      "scheduledOn": "2026-10-13",
+      "scheduledOn": "2026-10-20",
       "deadline": null,
       "waitingOn": "BA",
       "promisedTo": null,
@@ -1297,77 +1268,17 @@
       "jiraKey": "TDWEB-17824"
     },
     {
-      "id": "mv12zepq3fya",
-      "text": "DR [TDWEB-17826] Charts Compare — symbol/description CCA (Dark)",
-      "description": "https://jira.in.devexperts.com/browse/TDWEB-17826\n\n- 12.10.2026: seems to be the same issue as in https://jira.in.devexperts.com/browse/TDWEB-17826\npassed the ticket to the Dev team. Asked them to update the palette from Chameleon",
-      "cat": "work",
-      "priority": "p3",
-      "tagIds": [
-        "mns006zuavff",
-        "mnyawsv6pszp",
-        "mns00fjf6vcu",
-        "mnrzzd57bino"
-      ],
-      "done": false,
-      "milestones": [],
-      "comments": [],
-      "links": [],
-      "progress": 0,
-      "ts": 1791557339966,
-      "kind": "wait",
-      "scheduledOn": "2026-10-14",
-      "deadline": null,
-      "waitingOn": "Dev",
-      "promisedTo": null,
-      "nextCheckAt": "2026-10-14",
-      "timeEstimateMin": null,
-      "completedAt": null,
-      "rolloverCount": 0,
-      "project": "TDW",
-      "jiraKey": "TDWEB-17826"
-    },
-    {
-      "id": "mv12zepqw5yk",
-      "text": "DR [TDWEB-17830] Charts Compare — symbols CCA (Light)",
-      "description": "https://jira.in.devexperts.com/browse/TDWEB-17830\n- 12.10.2026: the ticket has been assigned back to Ina\nI found a bunch of specific variables for the Compare function:\n\n- main_chart-compare-plot_color-1 #D2320F\n- main_chart-compare-plot_color-2 #966600\n- main_chart-compare-plot_color-3 #087992\n- main_chart-compare-plot_color-4 #03821F\n- main_chart-compare-plot_color-5 #5A65BF\n- main_chart-compare-plot_color-6 #C2470A\n- main_chart-compare-plot_color-7 #767502\n- main_chart-compare-plot_color-8 #A535EB\nI have checked them all and came to the conclusion that the color ratios are quite acceptable. Perhaps the problem lies once again in outdated colors, and maybe we just need to update the palettes from Chameleon.",
-      "cat": "work",
-      "priority": "p3",
-      "tagIds": [
-        "mnrzzd57bino",
-        "mnyawsv6pszp",
-        "mns00n4rgrjt",
-        "mns00fjf6vcu",
-        "mns006zuavff"
-      ],
-      "done": false,
-      "milestones": [],
-      "comments": [],
-      "links": [],
-      "progress": 0,
-      "ts": 1791557339966,
-      "kind": "wait",
-      "scheduledOn": "2026-10-14",
-      "deadline": null,
-      "waitingOn": "TDWEB-14335",
-      "promisedTo": null,
-      "nextCheckAt": "2026-10-16",
-      "timeEstimateMin": null,
-      "completedAt": null,
-      "rolloverCount": 0,
-      "project": "TDW",
-      "jiraKey": "TDWEB-17830"
-    },
-    {
       "id": "muwg5z2bllz8",
-      "text": "[TDWEB-18060] Bid/Ask reserved-width prototype",
-      "description": "- 08.10.2026: Mimi shared her options, we agreed she will try to use black text for FTO… instead of shapes. The BG of the badged will make brighter\n- 06.10.2026: прочекать апдейты (Jira assignee Maria). ",
+      "text": "DR Mimi [TDWEB-18060] Bid/Ask reserved-width prototype",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-18060\n- 08.10.2026: Mimi shared her options, we agreed she will try to use black text for FTO… instead of shapes. The BG of the badged will make brighter\n- 06.10.2026: прочекать апдейты (Jira assignee Maria). ",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
         "mnrzzd57bino",
         "mns00fjf6vcu",
         "mns006zuavff",
-        "mnyawv54zt29"
+        "mns00n4rgrjt",
+        "mnyawsv6pszp"
       ],
       "done": false,
       "milestones": [],
@@ -1376,7 +1287,7 @@
       "progress": 0,
       "ts": 1791277150403,
       "kind": "wait",
-      "scheduledOn": "2026-10-13",
+      "scheduledOn": "2026-10-20",
       "deadline": null,
       "waitingOn": "Maria",
       "promisedTo": null,
@@ -1419,7 +1330,7 @@
     {
       "id": "mv6igpfjp3ac",
       "text": "👀 Lopes [TDWEB-18435] Web - Watchlist Import enhancement",
-      "description": "- 15.10.2026 — design + message sent to Lopes (modal for all outcomes; Partial ≈ Maria + Done + comma list + Show More/Less). Waiting on reply.\n- 15.10.2026: Trhe spec has been updated. The link to the spec's been sent to Daniel.\nThe new design task\n- 13.10.2026: https://jira.in.devexperts.com/browse/TDWEB-18435",
+      "description": "2026-10-16 — 16.10.2026 — design spec moved to new Figma (TDBL-4497 Pre-CAD): https://www.figma.com/design/DEqB7iAwDsAgaEmx93C9VH/TDBL-4497-%C2%B7%E2%80%89Pre-CAD-%C2%B7%E2%80%89Watchlist-Import-enhancement?node-id=1-600\n- 15.10.2026 — design + message sent to Lopes (modal for all outcomes; Partial ≈ Maria + Done + comma list + Show More/Less). Waiting on reply.\n- 15.10.2026: Trhe spec has been updated. The link to the spec's been sent to Daniel.\nThe new design task\n- 13.10.2026: https://jira.in.devexperts.com/browse/TDWEB-18435",
       "cat": "work",
       "priority": "p3",
       "tagIds": [
@@ -1473,6 +1384,185 @@
       "rolloverCount": 0,
       "project": null,
       "jiraKey": null
+    },
+    {
+      "id": "mvas3yg11wlw",
+      "text": "Lopes [TDWEB-18451] Charts - Databox UX enhancement",
+      "description": "2026-10-16 — 16.10.2026 — discuss with Lopes on Monday (19.10).\n16.10.2026 — Reported by Lopes; scope from TDBL-608. Note: Tickets/TDWEB-18451.md",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [],
+      "done": false,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1792143738145,
+      "kind": "do",
+      "scheduledOn": "2026-10-19",
+      "deadline": null,
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "timeEstimateMin": 90,
+      "completedAt": null,
+      "rolloverCount": 0,
+      "project": "TDW",
+      "jiraKey": "TDWEB-18451"
+    },
+    {
+      "id": "mv12zepqw5yk",
+      "text": "DR [TDWEB-17830] Charts Compare — symbols CCA (Light)",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-17830\n- 16.10.2026: Dimitar took this task. Will see how it goes.\n- 12.10.2026: the ticket has been assigned back to Ina\nI found a bunch of specific variables for the Compare function:\n\n- main_chart-compare-plot_color-1 #D2320F\n- main_chart-compare-plot_color-2 #966600\n- main_chart-compare-plot_color-3 #087992\n- main_chart-compare-plot_color-4 #03821F\n- main_chart-compare-plot_color-5 #5A65BF\n- main_chart-compare-plot_color-6 #C2470A\n- main_chart-compare-plot_color-7 #767502\n- main_chart-compare-plot_color-8 #A535EB\nI have checked them all and came to the conclusion that the color ratios are quite acceptable. Perhaps the problem lies once again in outdated colors, and maybe we just need to update the palettes from Chameleon.",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mnrzzd57bino",
+        "mnyawsv6pszp",
+        "mns00n4rgrjt",
+        "mns00fjf6vcu",
+        "mns006zuavff"
+      ],
+      "done": true,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791557339966,
+      "kind": "wait",
+      "scheduledOn": "2026-10-14",
+      "deadline": null,
+      "waitingOn": "TDWEB-14335",
+      "promisedTo": null,
+      "nextCheckAt": "2026-10-16",
+      "timeEstimateMin": null,
+      "completedAt": "2026-10-16T09:45:09.757Z",
+      "rolloverCount": 0,
+      "project": "TDW",
+      "jiraKey": "TDWEB-17830"
+    },
+    {
+      "id": "mv99baxdjjtf",
+      "text": "Dzhelebov TDBL-4411 — confirmed designers create web+mobile DRs",
+      "description": "- 15.10.2026: the web https://jira.in.devexperts.com/browse/TDWEB-18464\n- 14.10.2026: add the design tasks for https://jira.in.devexperts.com/browse/TDBL-4411",
+      "cat": "work",
+      "priority": "p2",
+      "tagIds": [
+        "mnrzzd57bino",
+        "mnyawq89hy4y",
+        "muvcz2chqkgy"
+      ],
+      "done": true,
+      "milestones": [
+        {
+          "id": "mv9mwvm34303",
+          "text": "create the web ticket",
+          "description": "https://jira.in.devexperts.com/browse/TDWEB-18464",
+          "priority": "p3",
+          "cat": "work",
+          "tagIds": [],
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mv9mxhhtba7w",
+          "text": "create Andriod ticket",
+          "description": "https://jira.in.devexperts.com/browse/TDMOBAND-6403",
+          "priority": "p3",
+          "cat": "work",
+          "tagIds": [],
+          "done": true,
+          "comments": [],
+          "links": []
+        },
+        {
+          "id": "mv9mx4pqhigc",
+          "text": "create iOS ticket",
+          "description": "https://jira.in.devexperts.com/browse/TDMOBIOS-8819",
+          "priority": "p3",
+          "cat": "work",
+          "tagIds": [],
+          "done": true,
+          "comments": [],
+          "links": []
+        }
+      ],
+      "comments": [],
+      "links": [],
+      "progress": 100,
+      "ts": 1792051702033,
+      "kind": "ongoing",
+      "scheduledOn": "2026-10-16",
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "deadline": null,
+      "timeEstimateMin": null,
+      "completedAt": "2026-10-16T07:22:23.979Z",
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": null
+    },
+    {
+      "id": "muuza60bqv7y",
+      "text": "P3 DR Tatiana Chibireva [TDWEB-18172] Risk Profile - Planned position misaligned in Positions table",
+      "description": "- 2026-10-06 — clarification done in Jira + RN design updated (node 4247-215543). DR left Confirmed with Tanya for impl. RO port → TDWEB-18389.\nhttps://jira.in.devexperts.com/browse/TDWEB-18172\n\n07.10.2026: I double-checked the current implementation, and decided to unify the left and right paddings within these tables, especially in the Position subsection. \nThe updated design: https://www.figma.com/design/aRqxryisyE3ZoXuQmYCTL3/TD-AT-%25F0%259F%258C%2590-RN?node-id=4247-215543&t=maX62VonMrWF4Jpp-11\nSent the ticket back to Tatyana. Will see how it goes.",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mnyawsv6pszp",
+        "mnrzzd57bino",
+        "mns006zuavff",
+        "mns00n4rgrjt"
+      ],
+      "done": true,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791188326379,
+      "kind": "wait",
+      "scheduledOn": "2026-10-05",
+      "waitingOn": null,
+      "promisedTo": null,
+      "nextCheckAt": null,
+      "deadline": null,
+      "timeEstimateMin": null,
+      "completedAt": "2026-10-15T20:49:57.161Z",
+      "rolloverCount": 0,
+      "project": null,
+      "jiraKey": "TDWEB-18172"
+    },
+    {
+      "id": "mv12zepq3fya",
+      "text": "DR [TDWEB-17826] Charts Compare — symbol/description CCA (Dark)",
+      "description": "https://jira.in.devexperts.com/browse/TDWEB-17826\n\n- 15.10.2026: Dimitar start working on the task. \n- 12.10.2026: seems to be the same issue as in https://jira.in.devexperts.com/browse/TDWEB-17826\npassed the ticket to the Dev team. Asked them to update the palette from Chameleon",
+      "cat": "work",
+      "priority": "p3",
+      "tagIds": [
+        "mns006zuavff",
+        "mnyawsv6pszp",
+        "mns00fjf6vcu",
+        "mnrzzd57bino"
+      ],
+      "done": true,
+      "milestones": [],
+      "comments": [],
+      "links": [],
+      "progress": 0,
+      "ts": 1791557339966,
+      "kind": "wait",
+      "scheduledOn": "2026-10-14",
+      "deadline": null,
+      "waitingOn": "Dev",
+      "promisedTo": null,
+      "nextCheckAt": "2026-10-14",
+      "timeEstimateMin": null,
+      "completedAt": "2026-10-16T07:47:50.075Z",
+      "rolloverCount": 0,
+      "project": "TDW",
+      "jiraKey": "TDWEB-17826"
     },
     {
       "id": "muykyr6901wo",
@@ -2238,18 +2328,37 @@
   ],
   "journal": [
     {
+      "id": "mvb2qy59ul7d",
+      "text": "Recent search: Figma Updates после Lopes; Option 1/2 в целом ок, открыт конфликт clear → no tabs vs sticky tabs (1a/1b)",
+      "ts": 1792054800000,
+      "tagIds": [
+        "mvawjngxaet2"
+      ]
+    },
+    {
+      "id": "mvb2qcsardlh",
+      "text": "Import watchlist: пересобрал flow (3 outcome → modal; Partial ≈ решение Марии + Done + comma list); спека в новый Figma, ушло Lopes — жду ответ от Лопеша",
+      "ts": 1792054800000,
+      "tagIds": [
+        "mvawjngxaet2"
+      ]
+    },
+    {
+      "id": "mvb182grgshu",
+      "text": "Lopes sync: recent search — для TD два UX (empty→recent-only vs секция сверху); compact без metadata сняли с пакета\nImport watchlist update — только Symbol, без country/preview-валидации; outcomes после Proceed, один канал нотификации",
+      "ts": 1791968400000,
+      "tagIds": [
+        "mvawjngxaet2"
+      ]
+    },
+    {
       "id": "mo8d03asf1fi",
       "text": "TDW design sync\n\nMimi\n- [TDW-1571] [CAD] Mobile UI - Unified account switching functionality across widgets\nhttps://jira.in.devexperts.com/browse/TDW-1571\n\nVitya\n- \n\nMe\n- [TDWEB-14105] [a11y][Feedback][Order Confirmation pop-up] - Text overlap and not aligned properly\nhttps://jira.in.devexperts.com/browse/TDWEB-14105",
       "ts": 1776759954868,
       "tagIds": [
-        "mnyaxsgr89pj"
+        "mnyaxsgr89pj",
+        "mvawjngxaet2"
       ]
-    },
-    {
-      "id": "mnopou96d9px",
-      "text": "kjah skajdh aksjd ad",
-      "ts": 1775572476741,
-      "tagIds": []
     }
   ],
   "tags": [
@@ -2327,6 +2436,16 @@
       "id": "mnyawv54zt29",
       "name": "P4",
       "order": 14
+    },
+    {
+      "id": "mvawjngxaet2",
+      "name": "practice",
+      "order": 15
+    },
+    {
+      "id": "mvb0tufgeq9x",
+      "name": "code_connect",
+      "order": 16
     }
   ],
   "settings": {
@@ -2346,5 +2465,5 @@
     "dayOverrides": {}
   },
   "schemaVersion": 2,
-  "updatedAt": "2026-10-15T20:41:09.304Z"
+  "updatedAt": "2026-10-16T14:54:10.043Z"
 }
